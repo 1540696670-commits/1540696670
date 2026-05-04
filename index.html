@@ -1,106 +1,144 @@
-export default function AIArchitecturePlatform() {
+export default function CinematicArchitectureWebsite() {
   return (
-    <div className="min-h-screen bg-[#050505] text-white overflow-hidden font-sans">
-      {/* Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[900px] h-[900px] rounded-full bg-white/[0.03] blur-3xl" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[900px] h-[900px] rounded-full bg-cyan-400/[0.04] blur-3xl" />
+    <div className="bg-[#030303] text-white overflow-hidden selection:bg-white selection:text-black">
+      {/* GLOBAL BACKGROUND */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-20%] left-[-10%] w-[1200px] h-[1200px] rounded-full bg-cyan-400/[0.03] blur-3xl animate-pulse" />
+        <div className="absolute bottom-[-30%] right-[-10%] w-[1200px] h-[1200px] rounded-full bg-white/[0.03] blur-3xl" />
       </div>
 
-      {/* Hero */}
-      <section className="relative min-h-screen flex items-center border-b border-white/10 overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2070&auto=format&fit=crop"
-            className="w-full h-full object-cover opacity-30 scale-105"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/40" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent,black)]" />
-        </div>
-
-        <div className="relative z-10 max-w-[1600px] mx-auto px-10 w-full grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
+      {/* NAV */}
+      <header className="fixed top-0 left-0 right-0 z-50 px-10 py-8 backdrop-blur-xl bg-black/10 border-b border-white/5">
+        <div className="max-w-[1700px] mx-auto flex items-center justify-between">
           <div>
-            <div className="mb-8 inline-flex items-center gap-3 px-5 py-3 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-2xl uppercase tracking-[0.25em] text-xs text-white/70">
-              AI Architectural Intelligence System
-            </div>
-
-            <h1 className="text-[80px] lg:text-[150px] leading-[0.85] font-extralight tracking-[-0.06em] mb-10">
-              Future
-              <br />
-              Of AI
-              <br />
-              Architecture
-            </h1>
-
-            <p className="max-w-2xl text-xl text-white/55 leading-10 mb-14 font-light">
-              面向规划、建筑与城市设计行业的新一代 AI 智能审图平台。
-              上传 PDF 图纸后，系统自动进行规范校核、文本识别、消防分析与 AI 审查。
-            </p>
-
-            <div className="flex flex-wrap gap-5">
-              <button className="group relative overflow-hidden px-10 py-5 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-all duration-500">
-                <span className="relative z-10">上传图纸</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white to-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-
-              <button className="px-10 py-5 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-xl text-lg hover:bg-white/[0.08] transition-all duration-500">
-                查看 AI 演示
-              </button>
+            <div className="text-sm tracking-[0.45em] uppercase text-white/60">
+              AI Architecture
             </div>
           </div>
 
-          <div className="relative flex items-center justify-center">
-            <div className="absolute w-[750px] h-[750px] rounded-full border border-white/10 animate-spin [animation-duration:30s]" />
-            <div className="absolute w-[560px] h-[560px] rounded-full border border-cyan-400/10 animate-spin [animation-duration:18s] [animation-direction:reverse]" />
+          <div className="hidden md:flex items-center gap-10 text-sm tracking-[0.25em] uppercase text-white/45">
+            <div className="hover:text-white transition-colors cursor-pointer">
+              Platform
+            </div>
+            <div className="hover:text-white transition-colors cursor-pointer">
+              Intelligence
+            </div>
+            <div className="hover:text-white transition-colors cursor-pointer">
+              Projects
+            </div>
+            <div className="hover:text-white transition-colors cursor-pointer">
+              Contact
+            </div>
+          </div>
+        </div>
+      </header>
 
-            <div className="relative w-[620px] aspect-square rounded-[60px] border border-white/10 bg-white/[0.04] backdrop-blur-3xl overflow-hidden shadow-[0_0_120px_rgba(255,255,255,0.08)] rotate-6 hover:rotate-0 transition-all duration-700">
-              <img
-                src="https://images.unsplash.com/photo-1529429617124-aee711a5ac1c?q=80&w=2070&auto=format&fit=crop"
-                className="absolute inset-0 w-full h-full object-cover opacity-40"
-              />
+      {/* HERO */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        <div className="absolute inset-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover opacity-40 scale-105"
+            src="https://cdn.coverr.co/videos/coverr-modern-architecture-1560927706996?download=1080p"
+          />
 
-              <div className="absolute inset-0 bg-gradient-to-br from-black/30 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/30" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent,black)]" />
+        </div>
 
-              <div className="relative z-10 p-10 h-full flex flex-col justify-between">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-white/40 uppercase tracking-[0.3em] text-xs mb-3">
-                      AI Review
+        <div className="relative z-10 max-w-[1700px] mx-auto w-full px-10 pt-32">
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-16 items-center">
+            <div>
+              <div className="mb-10 inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-2xl text-xs tracking-[0.35em] uppercase text-white/60">
+                Future Architectural Intelligence System
+              </div>
+
+              <h1 className="text-[90px] md:text-[150px] xl:text-[220px] leading-[0.82] font-extralight tracking-[-0.08em] mb-10">
+                AI
+                <br />
+                SPACE
+                <br />
+                FUTURE
+              </h1>
+
+              <div className="max-w-2xl text-white/50 text-xl leading-10 font-light mb-14">
+                面向规划、建筑与城市设计行业的新一代 AI 建筑智能平台。
+                自动审查 PDF 图纸、识别规范错误、分析消防逻辑与空间关系。
+              </div>
+
+              <div className="flex flex-wrap gap-5">
+                <button className="group relative overflow-hidden px-10 py-5 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-all duration-700">
+                  <span className="relative z-10">Upload Drawings</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white to-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                </button>
+
+                <button className="px-10 py-5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-2xl text-lg hover:bg-white/[0.08] transition-all duration-700">
+                  Watch Experience
+                </button>
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-center">
+              <div className="absolute w-[900px] h-[900px] rounded-full border border-white/5 animate-spin [animation-duration:50s]" />
+              <div className="absolute w-[700px] h-[700px] rounded-full border border-cyan-400/10 animate-spin [animation-duration:25s] [animation-direction:reverse]" />
+
+              <div className="relative w-[680px] aspect-[0.85] rounded-[60px] overflow-hidden border border-white/10 backdrop-blur-3xl bg-white/[0.03] rotate-[8deg] hover:rotate-0 transition-all duration-1000 shadow-[0_0_120px_rgba(255,255,255,0.06)]">
+                <img
+                  src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2070&auto=format&fit=crop"
+                  className="absolute inset-0 w-full h-full object-cover opacity-55"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/90" />
+
+                <div className="relative z-10 h-full p-10 flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-3">
+                        AI Analysis
+                      </div>
+
+                      <div className="text-5xl font-extralight tracking-tight leading-tight">
+                        Shenzhen
+                        <br />
+                        Headquarters
+                      </div>
                     </div>
 
-                    <div className="text-4xl font-light tracking-tight">
-                      深圳总部项目
-                    </div>
+                    <div className="w-4 h-4 rounded-full bg-emerald-400 animate-pulse" />
                   </div>
 
-                  <div className="h-4 w-4 rounded-full bg-emerald-400 animate-pulse" />
-                </div>
+                  <div className="space-y-5">
+                    <div className="rounded-[34px] border border-red-400/15 bg-red-500/10 backdrop-blur-xl p-7">
+                      <div className="uppercase tracking-[0.25em] text-xs text-red-300 mb-4">
+                        Fire Regulation Error
+                      </div>
 
-                <div className="space-y-5">
-                  <div className="rounded-[28px] border border-red-400/20 bg-red-500/10 backdrop-blur-xl p-6">
-                    <div className="text-red-300 uppercase tracking-[0.2em] text-xs mb-3">
-                      Fire Regulation
+                      <div className="text-3xl font-light mb-3">
+                        疏散距离超限
+                      </div>
+
+                      <div className="text-white/55 leading-8">
+                        AI 自动检测到疏散距离超过规范允许值 5.2m。
+                      </div>
                     </div>
 
-                    <div className="text-2xl font-light mb-3">
-                      疏散距离超限
-                    </div>
+                    <div className="grid grid-cols-2 gap-5">
+                      <div className="rounded-[30px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6">
+                        <div className="text-6xl font-extralight mb-4">12</div>
+                        <div className="text-white/45 uppercase tracking-[0.2em] text-xs">
+                          AI Issues
+                        </div>
+                      </div>
 
-                    <div className="text-white/55 leading-7">
-                      AI 检测到疏散距离超过规范允许值 5.2m
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-5">
-                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-                      <div className="text-5xl font-extralight mb-4">12</div>
-                      <div className="text-white/50">规范问题</div>
-                    </div>
-
-                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-                      <div className="text-5xl font-extralight mb-4">98%</div>
-                      <div className="text-white/50">识别准确率</div>
+                      <div className="rounded-[30px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6">
+                        <div className="text-6xl font-extralight mb-4">98%</div>
+                        <div className="text-white/45 uppercase tracking-[0.2em] text-xs">
+                          Recognition
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -110,33 +148,34 @@ export default function AIArchitecturePlatform() {
         </div>
       </section>
 
-      {/* Floating Architecture Strip */}
-      <section className="py-24 overflow-hidden border-b border-white/10 bg-white/[0.02]">
-        <div className="flex gap-8 w-max animate-[scroll_40s_linear_infinite] px-10">
+      {/* FLOATING IMAGE WALL */}
+      <section className="relative py-40 overflow-hidden border-y border-white/5">
+        <div className="flex gap-10 w-max animate-[scroll_60s_linear_infinite] px-10">
           {[
             'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1200&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=1200&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1460317442991-0ec209397118?q=80&w=1200&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1529429617124-aee711a5ac1c?q=80&w=1200&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop',
           ].map((src, i) => (
             <div
               key={i}
-              className="relative w-[520px] h-[320px] rounded-[36px] overflow-hidden border border-white/10 shrink-0 group"
+              className="group relative w-[700px] h-[440px] rounded-[50px] overflow-hidden border border-white/10 shrink-0"
             >
               <img
                 src={src}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]"
               />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
-              <div className="absolute bottom-8 left-8">
-                <div className="text-white/40 uppercase tracking-[0.25em] text-xs mb-3">
-                  AI Architecture
+              <div className="absolute bottom-10 left-10">
+                <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-4">
+                  Architecture Intelligence
                 </div>
 
-                <div className="text-3xl font-light tracking-tight">
-                  智能建筑审查系统
+                <div className="text-5xl font-extralight tracking-tight max-w-md leading-tight">
+                  AI Spatial Review System
                 </div>
               </div>
             </div>
@@ -144,49 +183,56 @@ export default function AIArchitecturePlatform() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="relative py-40 px-10">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="mb-24 grid lg:grid-cols-2 gap-16 items-end">
+      {/* FEATURES */}
+      <section className="relative py-44 px-10">
+        <div className="max-w-[1700px] mx-auto">
+          <div className="grid lg:grid-cols-2 gap-24 mb-28 items-end">
             <div>
-              <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-6">
-                System Capability
+              <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-6">
+                AI Capability
               </div>
 
-              <h2 className="text-[70px] leading-[0.95] font-extralight tracking-[-0.05em]">
-                AI 审图
+              <h2 className="text-[80px] leading-[0.9] font-extralight tracking-[-0.06em]">
+                Beyond
                 <br />
-                新工作流
+                Traditional
+                <br />
+                Review
               </h2>
             </div>
 
-            <div className="text-white/50 text-xl leading-10 max-w-2xl">
-              通过 AI + 规则引擎 + 规范数据库，自动识别建筑设计中的逻辑错误、消防问题与文本冲突。
+            <div className="text-white/50 text-2xl leading-[2.2] font-light max-w-2xl">
+              AI 自动识别建筑逻辑、消防问题、文本冲突与空间关系。
+              通过规范数据库与规则引擎实现真正的智能审图。
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
             {[
               {
-                title: 'PDF 图纸识别',
-                img: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop',
-              },
-              {
-                title: 'AI 自动审图',
+                title: 'PDF Intelligence',
+                desc: '自动识别建筑 PDF 图纸中的空间、文字与结构关系。',
                 img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop',
               },
               {
-                title: '规范数据库',
+                title: 'AI Regulation',
+                desc: '自动匹配 GB50016 等国家规范与地方规范。',
                 img: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=1200&auto=format&fit=crop',
               },
               {
-                title: '文本错误识别',
-                img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop',
+                title: 'Spatial Logic',
+                desc: '识别疏散、防火、面积与建筑空间逻辑错误。',
+                img: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1200&auto=format&fit=crop',
+              },
+              {
+                title: 'Text Recognition',
+                desc: 'OCR 自动识别文本错误、编号问题与规范冲突。',
+                img: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop',
               },
             ].map((item) => (
               <div
                 key={item.title}
-                className="group relative h-[520px] rounded-[42px] overflow-hidden border border-white/10"
+                className="group relative h-[620px] rounded-[50px] overflow-hidden border border-white/10"
               >
                 <img
                   src={item.img}
@@ -196,21 +242,21 @@ export default function AIArchitecturePlatform() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
 
                 <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="w-14 h-14 rounded-full border border-white/20 bg-white/[0.05] backdrop-blur-xl flex items-center justify-center text-xl">
+                  <div className="w-16 h-16 rounded-full border border-white/20 bg-white/[0.04] backdrop-blur-xl flex items-center justify-center text-xl">
                     ✦
                   </div>
 
                   <div>
-                    <div className="uppercase tracking-[0.25em] text-xs text-white/40 mb-4">
-                      Intelligent Review
+                    <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-5">
+                      AI Architecture
                     </div>
 
-                    <div className="text-4xl font-extralight tracking-tight mb-4">
+                    <div className="text-5xl leading-tight font-extralight tracking-tight mb-6">
                       {item.title}
                     </div>
 
-                    <div className="text-white/55 leading-8">
-                      AI 自动识别建筑图纸与文本逻辑。
+                    <div className="text-white/55 leading-9 text-lg">
+                      {item.desc}
                     </div>
                   </div>
                 </div>
@@ -220,25 +266,27 @@ export default function AIArchitecturePlatform() {
         </div>
       </section>
 
-      {/* Upload Experience */}
-      <section className="relative py-40 border-y border-white/10 overflow-hidden">
+      {/* UPLOAD EXPERIENCE */}
+      <section className="relative py-44 border-y border-white/5 overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2070&auto=format&fit=crop"
-            className="w-full h-full object-cover opacity-10"
+            className="w-full h-full object-cover opacity-10 scale-105"
           />
         </div>
 
-        <div className="relative z-10 max-w-[1600px] mx-auto px-10 grid lg:grid-cols-[0.9fr_1.1fr] gap-24 items-center">
+        <div className="relative z-10 max-w-[1700px] mx-auto px-10 grid lg:grid-cols-[0.9fr_1.1fr] gap-24 items-center">
           <div>
-            <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-6">
+            <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-6">
               Upload Workflow
             </div>
 
-            <h2 className="text-[70px] leading-[0.95] font-extralight tracking-[-0.05em] mb-12">
-              上传图纸
+            <h2 className="text-[90px] leading-[0.88] font-extralight tracking-[-0.06em] mb-16">
+              Upload
               <br />
-              AI 自动分析
+              Analyze
+              <br />
+              Generate
             </h2>
 
             <div className="space-y-10">
@@ -249,12 +297,12 @@ export default function AIArchitecturePlatform() {
                 '规范规则自动匹配',
                 '输出 AI 审查报告',
               ].map((step, i) => (
-                <div key={step} className="flex gap-6 items-start">
-                  <div className="w-14 h-14 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-xl flex items-center justify-center text-white/60">
+                <div key={step} className="flex gap-7 items-start">
+                  <div className="w-16 h-16 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-xl flex items-center justify-center text-white/55">
                     {i + 1}
                   </div>
 
-                  <div className="text-2xl font-light text-white/75 leading-10">
+                  <div className="text-3xl font-extralight tracking-tight text-white/75 leading-tight pt-3">
                     {step}
                   </div>
                 </div>
@@ -265,24 +313,24 @@ export default function AIArchitecturePlatform() {
           <div className="relative">
             <div className="absolute inset-0 blur-3xl bg-cyan-400/10 rounded-full" />
 
-            <div className="relative rounded-[52px] border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 overflow-hidden">
+            <div className="relative rounded-[60px] border border-white/10 bg-white/[0.03] backdrop-blur-3xl p-10 overflow-hidden shadow-[0_0_120px_rgba(255,255,255,0.06)]">
               <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-              <div className="relative z-10 border-2 border-dashed border-white/15 rounded-[40px] p-24 text-center hover:border-cyan-400/40 transition-all duration-700 group cursor-pointer">
-                <div className="text-[120px] font-thin mb-8 group-hover:scale-110 transition-transform duration-700">
+              <div className="relative z-10 border-2 border-dashed border-white/15 rounded-[44px] p-28 text-center hover:border-cyan-400/40 transition-all duration-1000 group cursor-pointer">
+                <div className="text-[160px] font-thin mb-10 group-hover:scale-110 transition-transform duration-700">
                   +
                 </div>
 
-                <div className="text-4xl font-extralight tracking-tight mb-5">
+                <div className="text-5xl font-extralight tracking-tight mb-6">
                   Drop Your Drawings
                 </div>
 
-                <div className="text-white/50 text-lg leading-8 max-w-xl mx-auto mb-10">
+                <div className="text-white/50 text-xl leading-10 max-w-2xl mx-auto mb-12 font-light">
                   支持建筑、规划、消防 PDF 图纸上传与 AI 智能识别。
                 </div>
 
-                <button className="px-10 py-5 rounded-full bg-white text-black text-lg hover:scale-105 transition-transform duration-500">
-                  选择文件
+                <button className="px-12 py-6 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-transform duration-700">
+                  Select Files
                 </button>
               </div>
             </div>
@@ -290,44 +338,55 @@ export default function AIArchitecturePlatform() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative py-24 px-10">
-        <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row justify-between gap-20">
+      {/* FOOTER */}
+      <footer className="relative py-28 px-10">
+        <div className="max-w-[1700px] mx-auto flex flex-col lg:flex-row justify-between gap-24">
           <div>
-            <div className="text-5xl font-extralight tracking-[-0.05em] mb-8">
-              AI Architecture
+            <div className="text-[70px] leading-[0.9] font-extralight tracking-[-0.06em] mb-10">
+              AI
+              <br />
+              Architecture
             </div>
 
-            <div className="text-white/45 leading-9 text-lg max-w-xl">
+            <div className="text-white/45 leading-10 text-xl max-w-2xl font-light">
               下一代 AI 建筑设计与智能审图平台。
-              让建筑师拥有真正的 AI 协作能力。
+              让建筑师真正拥有 AI 协作能力。
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-14 text-white/45">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-16 text-white/45 text-lg">
             <div>
-              <div className="text-white text-lg mb-6">Platform</div>
-              <div className="space-y-4">
+              <div className="text-white mb-7 uppercase tracking-[0.2em] text-sm">
+                Platform
+              </div>
+
+              <div className="space-y-5">
                 <div>AI 审图</div>
-                <div>规范库</div>
+                <div>规范数据库</div>
                 <div>OCR</div>
                 <div>PDF 分析</div>
               </div>
             </div>
 
             <div>
-              <div className="text-white text-lg mb-6">Technology</div>
-              <div className="space-y-4">
+              <div className="text-white mb-7 uppercase tracking-[0.2em] text-sm">
+                Technology
+              </div>
+
+              <div className="space-y-5">
                 <div>GPT-5</div>
                 <div>Next.js</div>
-                <div>FastAPI</div>
                 <div>Three.js</div>
+                <div>GSAP</div>
               </div>
             </div>
 
             <div>
-              <div className="text-white text-lg mb-6">Enterprise</div>
-              <div className="space-y-4">
+              <div className="text-white mb-7 uppercase tracking-[0.2em] text-sm">
+                Enterprise
+              </div>
+
+              <div className="space-y-5">
                 <div>私有化部署</div>
                 <div>BIM 审查</div>
                 <div>团队协作</div>
@@ -336,12 +395,15 @@ export default function AIArchitecturePlatform() {
             </div>
 
             <div>
-              <div className="text-white text-lg mb-6">Contact</div>
-              <div className="space-y-4">
-                <div>合作咨询</div>
-                <div>技术支持</div>
+              <div className="text-white mb-7 uppercase tracking-[0.2em] text-sm">
+                Contact
+              </div>
+
+              <div className="space-y-5">
                 <div>商业合作</div>
+                <div>技术支持</div>
                 <div>Architecture AI</div>
+                <div>Future Space</div>
               </div>
             </div>
           </div>
