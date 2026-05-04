@@ -1,73 +1,106 @@
 export default function AIArchitecturePlatform() {
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Hero */}
-      <section className="relative h-screen flex items-center justify-center border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_50%)]" />
+    <div className="min-h-screen bg-[#050505] text-white overflow-hidden font-sans">
+      {/* Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[900px] h-[900px] rounded-full bg-white/[0.03] blur-3xl" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[900px] h-[900px] rounded-full bg-cyan-400/[0.04] blur-3xl" />
+      </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-16 items-center">
+      {/* Hero */}
+      <section className="relative min-h-screen flex items-center border-b border-white/10 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2070&auto=format&fit=crop"
+            className="w-full h-full object-cover opacity-30 scale-105"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/40" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent,black)]" />
+        </div>
+
+        <div className="relative z-10 max-w-[1600px] mx-auto px-10 w-full grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
           <div>
-            <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-xl text-sm tracking-widest uppercase">
-              AI Architectural Intelligence Platform
+            <div className="mb-8 inline-flex items-center gap-3 px-5 py-3 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-2xl uppercase tracking-[0.25em] text-xs text-white/70">
+              AI Architectural Intelligence System
             </div>
 
-            <h1 className="text-6xl lg:text-8xl font-light leading-[0.95] tracking-tight mb-8">
-              AI
+            <h1 className="text-[80px] lg:text-[150px] leading-[0.85] font-extralight tracking-[-0.06em] mb-10">
+              Future
               <br />
-              建筑审图
+              Of AI
               <br />
-              平台
+              Architecture
             </h1>
 
-            <p className="text-white/60 text-lg leading-8 max-w-xl mb-10">
-              面向规划、建筑、消防设计师的下一代 AI 审图系统。
-              上传 PDF 图纸，自动核对规范、识别文本错误、生成审查报告。
+            <p className="max-w-2xl text-xl text-white/55 leading-10 mb-14 font-light">
+              面向规划、建筑与城市设计行业的新一代 AI 智能审图平台。
+              上传 PDF 图纸后，系统自动进行规范校核、文本识别、消防分析与 AI 审查。
             </p>
 
-            <div className="flex flex-wrap gap-4">
-              <button className="px-8 py-4 rounded-2xl bg-white text-black text-lg hover:scale-105 transition-transform">
-                上传图纸
+            <div className="flex flex-wrap gap-5">
+              <button className="group relative overflow-hidden px-10 py-5 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-all duration-500">
+                <span className="relative z-10">上传图纸</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white to-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
 
-              <button className="px-8 py-4 rounded-2xl border border-white/20 bg-white/5 backdrop-blur-xl hover:bg-white/10 transition-all text-lg">
-                查看演示
+              <button className="px-10 py-5 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-xl text-lg hover:bg-white/[0.08] transition-all duration-500">
+                查看 AI 演示
               </button>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="absolute inset-0 blur-3xl bg-white/10 rounded-full" />
+          <div className="relative flex items-center justify-center">
+            <div className="absolute w-[750px] h-[750px] rounded-full border border-white/10 animate-spin [animation-duration:30s]" />
+            <div className="absolute w-[560px] h-[560px] rounded-full border border-cyan-400/10 animate-spin [animation-duration:18s] [animation-direction:reverse]" />
 
-            <div className="relative rounded-[40px] border border-white/10 bg-white/5 backdrop-blur-2xl p-6 shadow-2xl">
-              <div className="aspect-[4/3] rounded-3xl bg-gradient-to-br from-zinc-900 to-zinc-800 border border-white/10 p-5 flex flex-col justify-between">
+            <div className="relative w-[620px] aspect-square rounded-[60px] border border-white/10 bg-white/[0.04] backdrop-blur-3xl overflow-hidden shadow-[0_0_120px_rgba(255,255,255,0.08)] rotate-6 hover:rotate-0 transition-all duration-700">
+              <img
+                src="https://images.unsplash.com/photo-1529429617124-aee711a5ac1c?q=80&w=2070&auto=format&fit=crop"
+                className="absolute inset-0 w-full h-full object-cover opacity-40"
+              />
+
+              <div className="absolute inset-0 bg-gradient-to-br from-black/30 to-black/80" />
+
+              <div className="relative z-10 p-10 h-full flex flex-col justify-between">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-sm text-white/40 mb-2">Current Project</div>
-                    <div className="text-2xl">综合体项目审查</div>
+                    <div className="text-white/40 uppercase tracking-[0.3em] text-xs mb-3">
+                      AI Review
+                    </div>
+
+                    <div className="text-4xl font-light tracking-tight">
+                      深圳总部项目
+                    </div>
                   </div>
 
-                  <div className="h-3 w-3 rounded-full bg-green-400 animate-pulse" />
+                  <div className="h-4 w-4 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
 
-                <div className="space-y-4">
-                  <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4">
-                    <div className="text-red-300 text-sm mb-2">消防规范问题</div>
-                    <div className="text-white/80">
-                      疏散距离超过规范允许值 5.2m
+                <div className="space-y-5">
+                  <div className="rounded-[28px] border border-red-400/20 bg-red-500/10 backdrop-blur-xl p-6">
+                    <div className="text-red-300 uppercase tracking-[0.2em] text-xs mb-3">
+                      Fire Regulation
+                    </div>
+
+                    <div className="text-2xl font-light mb-3">
+                      疏散距离超限
+                    </div>
+
+                    <div className="text-white/55 leading-7">
+                      AI 检测到疏散距离超过规范允许值 5.2m
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-yellow-400/30 bg-yellow-500/10 p-4">
-                    <div className="text-yellow-300 text-sm mb-2">文本错误</div>
-                    <div className="text-white/80">
-                      防火分区编号前后不一致
+                  <div className="grid grid-cols-2 gap-5">
+                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+                      <div className="text-5xl font-extralight mb-4">12</div>
+                      <div className="text-white/50">规范问题</div>
                     </div>
-                  </div>
 
-                  <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 p-4">
-                    <div className="text-cyan-300 text-sm mb-2">规范引用</div>
-                    <div className="text-white/80">
-                      GB50016-2014（2025版）
+                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+                      <div className="text-5xl font-extralight mb-4">98%</div>
+                      <div className="text-white/50">识别准确率</div>
                     </div>
                   </div>
                 </div>
@@ -77,98 +110,178 @@ export default function AIArchitecturePlatform() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-32 px-8 max-w-7xl mx-auto">
-        <div className="mb-20">
-          <div className="text-sm tracking-[0.3em] text-white/40 uppercase mb-4">
-            Core Features
-          </div>
-
-          <h2 className="text-5xl lg:text-7xl font-light leading-tight max-w-4xl">
-            面向未来的 AI 建筑审查系统
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+      {/* Floating Architecture Strip */}
+      <section className="py-24 overflow-hidden border-b border-white/10 bg-white/[0.02]">
+        <div className="flex gap-8 w-max animate-[scroll_40s_linear_infinite] px-10">
           {[
-            {
-              title: 'PDF 图纸识别',
-              desc: '自动识别建筑图纸中的房间、轴网、门窗与文本信息。',
-            },
-            {
-              title: '本地规范库',
-              desc: '接入 GB50016、GB50352 等国家规范与地方规范。',
-            },
-            {
-              title: 'AI 自动审查',
-              desc: '自动发现疏散、防火、面积与布局问题。',
-            },
-            {
-              title: '文本错误检查',
-              desc: '识别错别字、编号错误、术语不统一问题。',
-            },
-          ].map((item) => (
+            'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1200&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=1200&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1460317442991-0ec209397118?q=80&w=1200&auto=format&fit=crop',
+          ].map((src, i) => (
             <div
-              key={item.title}
-              className="group rounded-[32px] border border-white/10 bg-white/[0.03] p-8 hover:bg-white/[0.06] transition-all"
+              key={i}
+              className="relative w-[520px] h-[320px] rounded-[36px] overflow-hidden border border-white/10 shrink-0 group"
             >
-              <div className="h-14 w-14 rounded-2xl bg-white/10 mb-8 flex items-center justify-center text-xl">
-                ✦
+              <img
+                src={src}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+              />
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+              <div className="absolute bottom-8 left-8">
+                <div className="text-white/40 uppercase tracking-[0.25em] text-xs mb-3">
+                  AI Architecture
+                </div>
+
+                <div className="text-3xl font-light tracking-tight">
+                  智能建筑审查系统
+                </div>
               </div>
-
-              <h3 className="text-2xl mb-4">{item.title}</h3>
-
-              <p className="text-white/50 leading-7">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Upload Section */}
-      <section className="py-32 border-y border-white/10 bg-white/[0.02]">
-        <div className="max-w-6xl mx-auto px-8 grid lg:grid-cols-2 gap-20 items-center">
-          <div>
-            <div className="text-sm tracking-[0.3em] text-white/40 uppercase mb-4">
-              AI Review Flow
+      {/* Features */}
+      <section className="relative py-40 px-10">
+        <div className="max-w-[1600px] mx-auto">
+          <div className="mb-24 grid lg:grid-cols-2 gap-16 items-end">
+            <div>
+              <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-6">
+                System Capability
+              </div>
+
+              <h2 className="text-[70px] leading-[0.95] font-extralight tracking-[-0.05em]">
+                AI 审图
+                <br />
+                新工作流
+              </h2>
             </div>
 
-            <h2 className="text-5xl lg:text-6xl font-light leading-tight mb-8">
-              上传 PDF
-              <br />
-              自动核查规范
-            </h2>
+            <div className="text-white/50 text-xl leading-10 max-w-2xl">
+              通过 AI + 规则引擎 + 规范数据库，自动识别建筑设计中的逻辑错误、消防问题与文本冲突。
+            </div>
+          </div>
 
-            <div className="space-y-8">
-              {[
-                '上传 PDF 图纸',
-                'OCR 自动识别文本',
-                'AI 分析建筑逻辑',
-                '匹配国家规范',
-                '生成审查报告',
-              ].map((step, index) => (
-                <div key={step} className="flex gap-5 items-start">
-                  <div className="h-10 w-10 rounded-full border border-white/20 flex items-center justify-center text-sm text-white/60">
-                    {index + 1}
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-8">
+            {[
+              {
+                title: 'PDF 图纸识别',
+                img: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop',
+              },
+              {
+                title: 'AI 自动审图',
+                img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop',
+              },
+              {
+                title: '规范数据库',
+                img: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=1200&auto=format&fit=crop',
+              },
+              {
+                title: '文本错误识别',
+                img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="group relative h-[520px] rounded-[42px] overflow-hidden border border-white/10"
+              >
+                <img
+                  src={item.img}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1800ms]"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+
+                <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                  <div className="w-14 h-14 rounded-full border border-white/20 bg-white/[0.05] backdrop-blur-xl flex items-center justify-center text-xl">
+                    ✦
                   </div>
 
-                  <div className="text-xl text-white/80">{step}</div>
+                  <div>
+                    <div className="uppercase tracking-[0.25em] text-xs text-white/40 mb-4">
+                      Intelligent Review
+                    </div>
+
+                    <div className="text-4xl font-extralight tracking-tight mb-4">
+                      {item.title}
+                    </div>
+
+                    <div className="text-white/55 leading-8">
+                      AI 自动识别建筑图纸与文本逻辑。
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Upload Experience */}
+      <section className="relative py-40 border-y border-white/10 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2070&auto=format&fit=crop"
+            className="w-full h-full object-cover opacity-10"
+          />
+        </div>
+
+        <div className="relative z-10 max-w-[1600px] mx-auto px-10 grid lg:grid-cols-[0.9fr_1.1fr] gap-24 items-center">
+          <div>
+            <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-6">
+              Upload Workflow
+            </div>
+
+            <h2 className="text-[70px] leading-[0.95] font-extralight tracking-[-0.05em] mb-12">
+              上传图纸
+              <br />
+              AI 自动分析
+            </h2>
+
+            <div className="space-y-10">
+              {[
+                '上传 PDF / CAD 图纸',
+                'OCR 自动识别文本',
+                'AI 提取建筑构件',
+                '规范规则自动匹配',
+                '输出 AI 审查报告',
+              ].map((step, i) => (
+                <div key={step} className="flex gap-6 items-start">
+                  <div className="w-14 h-14 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-xl flex items-center justify-center text-white/60">
+                    {i + 1}
+                  </div>
+
+                  <div className="text-2xl font-light text-white/75 leading-10">
+                    {step}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div>
-            <div className="rounded-[36px] border border-white/10 bg-black/40 backdrop-blur-2xl p-8">
-              <div className="border-2 border-dashed border-white/20 rounded-[28px] p-16 text-center hover:border-white/40 transition-all cursor-pointer">
-                <div className="text-7xl mb-8">⬆</div>
+          <div className="relative">
+            <div className="absolute inset-0 blur-3xl bg-cyan-400/10 rounded-full" />
 
-                <div className="text-2xl mb-3">拖拽上传 PDF 图纸</div>
+            <div className="relative rounded-[52px] border border-white/10 bg-white/[0.04] backdrop-blur-3xl p-10 overflow-hidden">
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-                <div className="text-white/50 mb-8">
-                  支持建筑、规划、消防图纸
+              <div className="relative z-10 border-2 border-dashed border-white/15 rounded-[40px] p-24 text-center hover:border-cyan-400/40 transition-all duration-700 group cursor-pointer">
+                <div className="text-[120px] font-thin mb-8 group-hover:scale-110 transition-transform duration-700">
+                  +
                 </div>
 
-                <button className="px-8 py-4 rounded-2xl bg-white text-black text-lg hover:scale-105 transition-transform">
+                <div className="text-4xl font-extralight tracking-tight mb-5">
+                  Drop Your Drawings
+                </div>
+
+                <div className="text-white/50 text-lg leading-8 max-w-xl mx-auto mb-10">
+                  支持建筑、规划、消防 PDF 图纸上传与 AI 智能识别。
+                </div>
+
+                <button className="px-10 py-5 rounded-full bg-white text-black text-lg hover:scale-105 transition-transform duration-500">
                   选择文件
                 </button>
               </div>
@@ -177,149 +290,58 @@ export default function AIArchitecturePlatform() {
         </div>
       </section>
 
-      {/* Dashboard Preview */}
-      <section className="py-32 px-8 max-w-7xl mx-auto">
-        <div className="mb-16">
-          <div className="text-sm tracking-[0.3em] text-white/40 uppercase mb-4">
-            Dashboard
-          </div>
-
-          <h2 className="text-5xl lg:text-7xl font-light">
-            AI 审图控制台
-          </h2>
-        </div>
-
-        <div className="rounded-[40px] border border-white/10 bg-white/[0.03] overflow-hidden">
-          <div className="grid lg:grid-cols-[280px_1fr_340px] min-h-[700px]">
-            <div className="border-r border-white/10 p-6 bg-black/20">
-              <div className="text-white/40 text-sm mb-6">DRAWINGS</div>
-
-              <div className="space-y-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="aspect-[4/3] rounded-2xl bg-white/5 border border-white/10 p-4 flex items-end"
-                  >
-                    <div className="text-sm text-white/60">建筑平面图 A-{i}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative bg-gradient-to-br from-zinc-900 to-black flex items-center justify-center">
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-              <div className="relative w-[85%] aspect-[4/3] rounded-3xl bg-white/5 border border-white/10 overflow-hidden">
-                <div className="absolute top-[30%] left-[35%] w-40 h-24 border-2 border-red-400 rounded-xl">
-                  <div className="absolute -top-8 left-0 text-red-300 text-sm whitespace-nowrap">
-                    疏散距离超限
-                  </div>
-                </div>
-
-                <div className="absolute top-[58%] left-[52%] w-36 h-20 border-2 border-yellow-400 rounded-xl">
-                  <div className="absolute -top-8 left-0 text-yellow-300 text-sm whitespace-nowrap">
-                    文本编号错误
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-l border-white/10 p-6 bg-black/20">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <div className="text-white/40 text-sm">AI REPORT</div>
-                  <div className="text-2xl mt-2">审查结果</div>
-                </div>
-
-                <div className="px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
-                  12 问题
-                </div>
-              </div>
-
-              <div className="space-y-5">
-                {[
-                  {
-                    title: '消防疏散距离超限',
-                    level: '高风险',
-                  },
-                  {
-                    title: '楼梯净宽不足',
-                    level: '中风险',
-                  },
-                  {
-                    title: '防火分区编号错误',
-                    level: '低风险',
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-5"
-                  >
-                    <div className="text-lg mb-2">{item.title}</div>
-
-                    <div className="text-white/40 text-sm mb-3">
-                      GB50016 建筑设计防火规范
-                    </div>
-
-                    <div className="inline-flex px-3 py-1 rounded-full bg-white/10 text-sm text-white/70">
-                      {item.level}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="border-t border-white/10 py-16 px-8">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between gap-10">
+      <footer className="relative py-24 px-10">
+        <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row justify-between gap-20">
           <div>
-            <div className="text-3xl font-light mb-4">
-              AI Architecture Platform
+            <div className="text-5xl font-extralight tracking-[-0.05em] mb-8">
+              AI Architecture
             </div>
 
-            <div className="text-white/40 leading-7 max-w-md">
-              下一代 AI 建筑设计与审图平台。
-              为规划、建筑与工程行业提供智能化审查能力。
+            <div className="text-white/45 leading-9 text-lg max-w-xl">
+              下一代 AI 建筑设计与智能审图平台。
+              让建筑师拥有真正的 AI 协作能力。
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-white/50">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-14 text-white/45">
             <div>
-              <div className="text-white mb-4">Platform</div>
-              <div className="space-y-3">
+              <div className="text-white text-lg mb-6">Platform</div>
+              <div className="space-y-4">
                 <div>AI 审图</div>
                 <div>规范库</div>
                 <div>OCR</div>
+                <div>PDF 分析</div>
               </div>
             </div>
 
             <div>
-              <div className="text-white mb-4">Technology</div>
-              <div className="space-y-3">
+              <div className="text-white text-lg mb-6">Technology</div>
+              <div className="space-y-4">
                 <div>GPT-5</div>
                 <div>Next.js</div>
                 <div>FastAPI</div>
+                <div>Three.js</div>
               </div>
             </div>
 
             <div>
-              <div className="text-white mb-4">Support</div>
-              <div className="space-y-3">
-                <div>帮助中心</div>
-                <div>联系我们</div>
+              <div className="text-white text-lg mb-6">Enterprise</div>
+              <div className="space-y-4">
+                <div>私有化部署</div>
+                <div>BIM 审查</div>
+                <div>团队协作</div>
                 <div>API</div>
               </div>
             </div>
 
             <div>
-              <div className="text-white mb-4">Enterprise</div>
-              <div className="space-y-3">
-                <div>私有化部署</div>
-                <div>企业版</div>
-                <div>BIM</div>
+              <div className="text-white text-lg mb-6">Contact</div>
+              <div className="space-y-4">
+                <div>合作咨询</div>
+                <div>技术支持</div>
+                <div>商业合作</div>
+                <div>Architecture AI</div>
               </div>
             </div>
           </div>
