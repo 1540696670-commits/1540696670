@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建筑设计师 | 张三</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: #f5f3f0;
+            color: #2c2c2c;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 2rem;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        h1 {
+            font-size: 2.8rem;
+            letter-spacing: -0.02em;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .sub {
+            color: #6b6b6b;
+            font-size: 1.1rem;
+            border-top: 1px solid #ddd;
+            display: inline-block;
+            padding-top: 0.5rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15);
+        }
+        .card-img {
+            background-color: #e9e6e2;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8a7f72;
+            font-size: 0.9rem;
+        }
+        /* 模拟占位图片，您可以换成真实图片url */
+        .card-content {
+            padding: 1.5rem;
+        }
+        .card h3 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            color: #5e5e5e;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        .tag {
+            display: inline-block;
+            background: #efebe6;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: #4a3e32;
+        }
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0dbd4;
+            color: #8a7f72;
+            font-size: 0.85rem;
+        }
+        .intro {
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+            text-align: center;
+            color: #4a4a4a;
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1.5rem; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>张 三 · 建筑与规划</h1>
+        <div class="sub">Architecture · Urban Design · AI 探索</div>
+    </header>
+    <div class="intro">
+        以空间叙事为起点，融合在地性与数字工具。近年专注 AI 辅助设计工作流，作品涵盖文化建筑、微更新与概念规划。
+    </div>
+
+    <div class="grid">
+        <!-- 项目 1 -->
+        <div class="card">
+            <div class="card-img">📸 [ 山谷艺术中心 · 效果图 ]</div>
+            <div class="card-content">
+                <h3>山谷艺术中心</h3>
+                <p>回应地形与光线，采用当地毛石与胶合木，塑造沉浸式展览空间。2025 WA 入围奖。</p>
+                <span class="tag">文化建筑</span> <span class="tag">参数化</span>
+            </div>
+        </div>
+        <!-- 项目 2 -->
+        <div class="card">
+            <div class="card-img">📸 [ 滨水社区规划 ]</div>
+            <div class="card-content">
+                <h3>滨水社区 · 宁德</h3>
+                <p>基于微气候模拟的组团布局，公共空间渗透率提升30%。</p>
+                <span class="tag">城市设计</span> <span class="tag">绿色低碳</span>
+            </div>
+        </div>
+        <!-- 项目 3 -->
+        <div class="card">
+            <div class="card-img">🤖 [ AI 生成 · 概念立面 ]</div>
+            <div class="card-content">
+                <h3>AI 辅助设计实验</h3>
+                <p>利用 Stable Diffusion + ControlNet 批量生成立面变体，结合本地知识库筛选。</p>
+                <span class="tag">AI 建筑</span> <span class="tag">工作流</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        © 2026 张三 · 设计咨询 · 联系: zhang.design@example.com
+    </footer>
+</div>
+</body>
+</html>
