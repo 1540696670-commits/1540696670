@@ -3,32 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>东方汉字空间实验室 | 汉字×建筑×AI</title>
-    <!-- Google Fonts 引入支持未来主义的无衬线字体 -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <title>汉字骨架实验室 | 構 · 建筑参数化空间</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,200;14..32,400;14..32,600;14..32,800&display=swap" rel="stylesheet">
     <style>
-        /* 全局重置与基础样式 - 东方未来主义暗黑基调 */
+        /* 全局重置 - 东方未来主义暗黑基底 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* 提升装置感，部分文本可选择但留白区域避免干扰 */
+            user-select: none;
         }
 
         body {
             font-family: 'Inter', 'Neue Haas Grotesk', sans-serif;
             background-color: #000000;
-            color: #e8e6e1;
+            color: #ece8e0;
             overflow-x: hidden;
             overscroll-behavior: none;
         }
 
-        /* 平滑滚动与隐藏默认滚动条（自定义滚动感） */
+        /* 平滑滚动，自定义滚动条 */
         html {
             scroll-behavior: smooth;
         }
-
-        /* 自定义滚动条微调 */
         ::-webkit-scrollbar {
             width: 3px;
             background: #050505;
@@ -38,7 +35,7 @@
             border-radius: 2px;
         }
 
-        /* canvas 全屏 Three.js 背景层 */
+        /* Canvas 全屏 Three.js 场景 */
         #canvas-container {
             position: fixed;
             top: 0;
@@ -46,17 +43,16 @@
             width: 100vw;
             height: 100vh;
             z-index: 0;
-            pointer-events: none; /* 让canvas不阻挡UI交互但保留视觉 */
+            pointer-events: auto; /* 允许交互捕捉鼠标位置，用于笔画变形 */
         }
 
-        /* 内容容器，覆盖在canvas之上 */
+        /* 内容层覆盖，但只有UI可点 */
         .content {
             position: relative;
-            z-index: 10;
+            z-index: 20;
             pointer-events: auto;
         }
 
-        /* 每个section占据视口高度，用于滚动锚点 */
         section {
             min-height: 100vh;
             width: 100%;
@@ -65,210 +61,182 @@
             justify-content: center;
             position: relative;
             padding: 2rem;
-            will-change: transform;
+            backdrop-filter: blur(0px);
+            transition: backdrop-filter 0.3s;
         }
 
-        /* 自定义容器宽高限定 */
         .screen-container {
             max-width: 1400px;
             width: 100%;
             margin: 0 auto;
             position: relative;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 70, 40, 0.3);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.3);
         }
 
-        /* ---------- 第一屏：中央汉字装置 ---------- */
-        .hero-chinese {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: none;
-        }
-        .hero-chinese h1 {
-            font-size: clamp(12rem, 25vw, 28rem);
-            font-weight: 800;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.02em;
-            color: #eaeaea;
-            text-shadow: 0 0 15px rgba(255, 60, 0, 0.3);
-            transition: all 0.1s cubic-bezier(0.2, 1.2, 0.3, 1);
-            transform-origin: center;
-            will-change: transform, letter-spacing;
-            position: relative;
-            z-index: 20;
-        }
-
-        /* 第二屏：汉字解构网格 */
+        /* 第二屏：汉字解构卡片 */
         .deconstruction-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 3rem;
-            perspective: 1200px;
+            gap: 2rem;
         }
         .char-card {
-            background: rgba(10, 10, 12, 0.65);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 80, 40, 0.3);
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 80, 40, 0.4);
             border-radius: 32px;
-            padding: 2rem 2rem;
-            width: 220px;
+            padding: 1.5rem;
+            width: 200px;
             text-align: center;
-            transition: all 0.4s ease;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             cursor: pointer;
-            transform-style: preserve-3d;
         }
         .char-card:hover {
-            border-color: #ff4a2a;
-            box-shadow: 0 0 35px rgba(255, 60, 0, 0.3);
-            transform: translateY(-12px) rotateX(5deg);
-            background: rgba(20, 18, 22, 0.9);
+            border-color: #ff5a3a;
+            transform: translateY(-8px) scale(1.02);
+            background: #1a171e;
+            box-shadow: 0 0 30px rgba(255, 60, 0, 0.4);
         }
         .big-char {
-            font-size: 6rem;
+            font-size: 5rem;
             font-weight: 800;
-            margin-bottom: 1rem;
-            transition: all 0.3s;
             letter-spacing: 0;
+            transition: 0.2s;
         }
         .char-meaning {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
+            color: #ffaa7a;
             letter-spacing: 2px;
-            font-weight: 300;
-            color: #ff9f7a;
         }
-        .char-description {
-            font-size: 0.75rem;
-            margin-top: 1rem;
-            color: #bbb;
-            font-weight: 300;
+        .char-desc {
+            font-size: 0.7rem;
+            margin-top: 0.8rem;
+            color: #bcaea2;
         }
 
-        /* 第三屏：AI扫描模拟 */
+        /* 第三屏AI扫描区 */
         .ai-scan-area {
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 48px;
-            padding: 2.5rem;
-            border: 1px solid rgba(255, 70, 30, 0.6);
-            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            border-radius: 40px;
+            padding: 2rem;
         }
         .upload-zone {
             border: 2px dashed #ff4a2a;
             border-radius: 32px;
-            padding: 2.5rem;
+            padding: 2rem;
             text-align: center;
-            transition: all 0.2s;
-            background: rgba(0,0,0,0.4);
+            transition: 0.2s;
             cursor: pointer;
         }
         .upload-zone:hover {
-            background: rgba(255, 60, 30, 0.1);
-            border-color: #ff795a;
+            background: rgba(255, 70, 40, 0.15);
         }
         .preview-img {
             max-width: 100%;
-            max-height: 400px;
-            margin: 1rem auto;
+            max-height: 300px;
             border-radius: 20px;
-            object-fit: contain;
-        }
-        .scan-overlay {
-            position: relative;
+            margin-top: 1rem;
         }
         .error-mark {
             position: absolute;
             border: 2px solid #ff2a00;
-            background: rgba(255, 42, 0, 0.2);
-            box-shadow: 0 0 12px rgba(255, 42, 0, 0.6);
+            background: rgba(255, 42, 0, 0.25);
+            box-shadow: 0 0 12px #ff2a00;
             pointer-events: none;
             border-radius: 4px;
-            animation: pulseRed 1.2s infinite;
+            animation: pulse 1.2s infinite;
         }
-        @keyframes pulseRed {
-            0% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(255, 42, 0, 0.4);}
-            100% { opacity: 1; box-shadow: 0 0 12px 4px rgba(255, 42, 0, 0.7);}
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; box-shadow: 0 0 18px #ff2a00; }
         }
-        /* 第四屏：拖拽重组区 */
+
+        /* 第四屏 拖拽重组 */
         .drag-lab {
             display: flex;
             flex-direction: column;
             gap: 2rem;
             align-items: center;
         }
-        .draggable-set {
+        .drag-items {
             display: flex;
             gap: 2rem;
-            justify-content: center;
             flex-wrap: wrap;
+            justify-content: center;
         }
-        .drag-item {
-            font-size: 5rem;
-            background: rgba(20,18,24,0.8);
-            backdrop-filter: blur(4px);
-            padding: 1rem 1.5rem;
-            border-radius: 42px;
+        .drag-part {
+            font-size: 4rem;
+            background: rgba(20,18,24,0.9);
+            backdrop-filter: blur(8px);
+            padding: 0.7rem 1.3rem;
+            border-radius: 60px;
             border: 1px solid #ff5a3a;
             cursor: grab;
-            transition: all 0.2s;
-            user-select: none;
-            display: inline-block;
+            transition: transform 0.1s;
         }
-        .drag-item:active {
-            cursor: grabbing;
-        }
+        .drag-part:active { cursor: grabbing; }
         .assembly-zone {
-            min-height: 220px;
+            min-height: 180px;
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             border: 2px dashed #ff7a4a;
             border-radius: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 1rem;
-            background: rgba(0,0,0,0.3);
-            transition: all 0.2s;
             font-size: 5rem;
             font-weight: 800;
-            color: #ffaa88;
+            background: rgba(0,0,0,0.4);
+            transition: 0.2s;
         }
-        /* 第五屏 规范语法树 */
+
+        /* 第五屏语法树 */
         .syntax-tree {
             display: flex;
             justify-content: center;
-            gap: 3rem;
+            gap: 2rem;
             flex-wrap: wrap;
         }
         .tree-node {
-            background: linear-gradient(145deg, #111, #050505);
-            border-left: 3px solid #ff4a2a;
-            padding: 1.2rem 1.8rem;
-            border-radius: 20px;
-            width: 240px;
-            transition: transform 0.3s;
+            background: #0a0a0c;
+            border-left: 4px solid #ff4a2a;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            width: 200px;
         }
-        .tree-node:hover {
-            transform: translateX(8px);
-            background: #1a181c;
+        .tree-node h3 { font-size: 1.8rem; font-weight: 700; }
+        .tree-node p { font-size: 0.7rem; color: #c9b6a8; margin-top: 0.5rem; }
+
+        button {
+            background: none;
+            border: 1px solid #ff5a3a;
+            color: #ffbc9a;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .node-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-        .node-desc {
-            font-size: 0.75rem;
-            color: #ccaa99;
-            margin-top: 0.5rem;
+        button:hover {
+            background: #ff3a2a20;
+            border-color: #ff8a6a;
         }
 
-        /* 全局文字指引光标 */
+        @media (max-width: 760px) {
+            .char-card { width: 160px; padding: 1rem; }
+            .big-char { font-size: 3rem; }
+            .drag-part { font-size: 2.5rem; }
+        }
         .custom-cursor {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border: 2px solid #ff4a2a;
             border-radius: 50%;
             position: fixed;
@@ -276,29 +244,6 @@
             z-index: 9999;
             transition: 0.05s linear;
             mix-blend-mode: difference;
-        }
-
-        @media (max-width: 760px) {
-            .char-card { width: 160px; padding: 1rem; }
-            .big-char { font-size: 3rem; }
-            .drag-item { font-size: 3rem; padding: 0.5rem 1rem;}
-            .assembly-zone { font-size: 3rem;}
-            section { padding: 1rem;}
-        }
-        .btn-outline {
-            background: none;
-            border: 1px solid #ff4a2a;
-            color: #ffaa88;
-            padding: 0.6rem 1.2rem;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: all 0.2s;
-            margin-top: 1rem;
-            cursor: pointer;
-        }
-        .btn-outline:hover {
-            background: #ff4a2a22;
-            border-color: #ff8a6a;
         }
     </style>
 </head>
@@ -308,106 +253,83 @@
 <div class="custom-cursor" id="cursor"></div>
 
 <div class="content">
-    <!-- 第一屏：英雄区域 巨型汉字装置 -->
-    <section id="screen1">
-        <div class="hero-chinese">
-            <h1 id="heroChar">構</h1>
+    <!-- 第一屏：由Canvas展示3D骨架汉字“構”，此处只保留占位 -->
+    <section id="screen1" style="background: transparent; backdrop-filter: blur(0);">
+        <div style="text-align: center; pointer-events: none;">
+            <p style="font-size: 0.8rem; letter-spacing: 4px; background: rgba(0,0,0,0.6); display: inline-block; padding: 0.5rem 1rem; border-radius: 40px;">◈ 汉字参数建筑 · 笔画骨架系统 ◈</p>
         </div>
     </section>
 
-    <!-- 第二屏：汉字解构 建筑可视化 -->
     <section id="screen2">
         <div class="screen-container">
             <div class="deconstruction-grid">
-                <div class="char-card" data-char="門" data-cad="门厅入口平面">
+                <div class="char-card" data-stroke="door">
                     <div class="big-char">門</div>
                     <div class="char-meaning">空间入口</div>
-                    <div class="char-description">门即边界，空间叙事之始</div>
+                    <div class="char-desc">边界与叙事起点</div>
                 </div>
-                <div class="char-card" data-char="間" data-cad="光井剖面">
+                <div class="char-card" data-stroke="light">
                     <div class="big-char">間</div>
                     <div class="char-meaning">光的进入</div>
-                    <div class="char-description">虚实相生，光隙叙写容积</div>
+                    <div class="char-desc">虚空与光隙</div>
                 </div>
-                <div class="char-card" data-char="火" data-cad="消防疏散逻辑">
+                <div class="char-card" data-stroke="fire">
                     <div class="big-char">火</div>
-                    <div class="char-meaning">消防规范</div>
-                    <div class="char-description">火焰警示，安全拓扑</div>
+                    <div class="char-meaning">消防逻辑</div>
+                    <div class="char-desc">安全拓扑学</div>
                 </div>
-                <div class="char-card" data-char="井" data-cad="网格系统轴线">
+                <div class="char-card" data-stroke="well">
                     <div class="big-char">井</div>
                     <div class="char-meaning">城市网格</div>
-                    <div class="char-description">结构秩序，参数化基底</div>
+                    <div class="char-desc">参数化基底</div>
                 </div>
-                <div class="char-card" data-char="構" data-cad="系统骨架连接">
+                <div class="char-card" data-stroke="structure">
                     <div class="big-char">構</div>
                     <div class="char-meaning">系统连接</div>
-                    <div class="char-description">构件耦合，建筑语法核</div>
+                    <div class="char-desc">构件耦合</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 第三屏：AI建筑扫描仪 + 审图模拟 -->
     <section id="screen3">
-        <div class="screen-container">
-            <div class="ai-scan-area">
-                <h2 style="font-weight: 500; letter-spacing: 1px; margin-bottom: 1rem;">◈ 建筑扫描实验室 ◈</h2>
-                <div id="uploadZone" class="upload-zone">
-                    <p>⤴ 拖拽或点击上传 平面图 / PDF / 图片</p>
-                    <input type="file" id="fileInput" accept="image/jpeg,image/png,application/pdf" style="display: none;">
-                    <div id="previewContainer" style="position: relative; margin-top: 1rem;"></div>
-                </div>
-                <div id="scanResult" style="margin-top: 1rem; font-size: 0.8rem; color: #ffb488;"></div>
+        <div class="screen-container ai-scan-area">
+            <h2 style="font-weight: 400; letter-spacing: 1px;">◈ 建筑扫描仪 · AI 审图 ◈</h2>
+            <div id="uploadZone" class="upload-zone">
+                <p>⤴ 拖拽或点击上传 平面图 / PDF / 图纸</p>
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,application/pdf" style="display: none;">
+                <div id="previewContainer" style="position: relative; margin-top: 1rem;"></div>
             </div>
+            <div id="scanMsg" style="margin-top: 1rem; color: #ffb88c; font-size: 0.8rem;"></div>
         </div>
     </section>
 
-    <!-- 第四屏：汉字重组生成建筑 -->
     <section id="screen4">
         <div class="screen-container drag-lab">
-            <p style="letter-spacing: 3px;">汉字机关 · 参数化合龙</p>
-            <div class="draggable-set">
-                <div class="drag-item" draggable="true" data-part="木">木</div>
-                <div class="drag-item" draggable="true" data-part="门">门</div>
-                <div class="drag-item" draggable="true" data-part="火">火</div>
+            <p>汉字机关 · 参数化合龙</p>
+            <div class="drag-items">
+                <div class="drag-part" draggable="true" data-part="木">木</div>
+                <div class="drag-part" draggable="true" data-part="门">门</div>
+                <div class="drag-part" draggable="true" data-part="火">火</div>
             </div>
-            <div id="assemblyZone" class="assembly-zone">⟡ 组合成構 ⟡</div>
-            <p style="font-size: 0.7rem; opacity: 0.6;">拖放部首至下方区域，重组「構」· 生成建筑空间</p>
-            <div id="generatedPlan" style="font-size: 0.8rem; color:#ffaa77; margin-top: 10px;"></div>
+            <div id="assemblyZone" class="assembly-zone">⟡ 组合成「構」 ⟡</div>
+            <div id="genResult" style="font-size: 0.8rem; color: #ffaa77;"></div>
         </div>
     </section>
 
-    <!-- 第五屏：规范语法树 -->
     <section id="screen5">
         <div class="screen-container">
-            <h3 style="text-align: center; margin-bottom: 2rem; font-weight: 400;">建筑规范 · 语法树</h3>
+            <h3 style="text-align: center; margin-bottom: 1.5rem;">建筑规范 · 语法树</h3>
             <div class="syntax-tree">
-                <div class="tree-node">
-                    <div class="node-title">疏</div>
-                    <div class="node-desc">顺畅的逻辑 · 动线密度</div>
-                </div>
-                <div class="tree-node">
-                    <div class="node-title">散</div>
-                    <div class="node-desc">分散至安全 · 出口间距</div>
-                </div>
-                <div class="tree-node">
-                    <div class="node-title">距</div>
-                    <div class="node-desc">空间变量 · 防火分区</div>
-                </div>
-                <div class="tree-node">
-                    <div class="node-title">構</div>
-                    <div class="node-desc">结构承重 · 汉字参数化</div>
-                </div>
-            </div>
-            <div style="text-align: center; margin-top: 3rem;">
-                <p style="font-size: 0.8rem; border-top: 1px solid #ff4a2a30; padding-top: 1rem;">语法即规范 | 东方参数建筑准则</p>
+                <div class="tree-node"><h3>疏</h3><p>顺畅的逻辑 · 动线密度</p></div>
+                <div class="tree-node"><h3>散</h3><p>分散至安全 · 出口间距</p></div>
+                <div class="tree-node"><h3>距</h3><p>空间变量 · 防火分区</p></div>
+                <div class="tree-node"><h3>構</h3><p>结构承重 · 东方参数</p></div>
             </div>
         </div>
     </section>
 </div>
 
-<!-- 引入Three.js核心库与扩展 -->
 <script type="importmap">
     {
         "imports": {
@@ -421,255 +343,313 @@
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import gsap from 'https://unpkg.com/gsap@3.12.5/index.js';
-    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-    // ---- 初始化Three场景 营造漂浮粒子空间 ----
+    // ---------- 1. 初始化场景 ----------
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.FogExp2(0x000000, 0.008);
+    scene.fog = new THREE.FogExp2(0x000000, 0.012);
 
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 2, 12);
+    camera.position.set(0, 1.5, 9);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.shadowMap.enabled = true; // 增强立体感
     container.appendChild(renderer.domElement);
-    
-    // 粒子系统代表汉字空间中漂浮的建筑粒子
-    const particleCount = 1800;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-        positions[i*3] = (Math.random() - 0.5) * 40;
-        positions[i*3+1] = (Math.random() - 0.5) * 20;
-        positions[i*3+2] = (Math.random() - 0.5) * 20 - 10;
-    }
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const particleMat = new THREE.PointsMaterial({ color: 0xff5533, size: 0.05, transparent: true, opacity: 0.4 });
-    const particles = new THREE.Points(geometry, particleMat);
-    scene.add(particles);
-    
-    // 添加淡蓝色的光晕线框 汉字轴线暗示
-    const gridHelper = new THREE.GridHelper(30, 40, 0xff4422, 0x332211);
-    gridHelper.position.y = -2;
-    gridHelper.material.transparent = true;
-    gridHelper.material.opacity = 0.18;
-    scene.add(gridHelper);
-    
-    // 悬浮光晕球体增加张力
+
+    // 灯光系统
     const ambientLight = new THREE.AmbientLight(0x221111);
     scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xff4422, 0.6, 25);
-    pointLight.position.set(2, 3, 4);
-    scene.add(pointLight);
+    const mainLight = new THREE.DirectionalLight(0xffaa88, 1.2);
+    mainLight.position.set(2, 5, 3);
+    mainLight.castShadow = true;
+    scene.add(mainLight);
+    const fillLight = new THREE.PointLight(0xff4422, 0.6);
+    fillLight.position.set(1, 2, 4);
+    scene.add(fillLight);
+    const backLight = new THREE.PointLight(0x2255ff, 0.4);
+    backLight.position.set(-2, 1, -4);
+    scene.add(backLight);
+
+    // 辅助网格地面 (极淡)
+    const gridHelper = new THREE.GridHelper(25, 30, 0xff5533, 0x442211);
+    gridHelper.position.y = -1.2;
+    gridHelper.material.transparent = true;
+    gridHelper.material.opacity = 0.15;
+    scene.add(gridHelper);
+
+    // 粒子氛围
+    const particleCount = 2000;
+    const particleGeo = new THREE.BufferGeometry();
+    const posArray = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+        posArray[i*3] = (Math.random() - 0.5) * 35;
+        posArray[i*3+1] = (Math.random() - 0.5) * 18;
+        posArray[i*3+2] = (Math.random() - 0.5) * 20 - 8;
+    }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const particleMat = new THREE.PointsMaterial({ color: 0xff6644, size: 0.045, transparent: true, opacity: 0.35 });
+    const particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
+
+    // ---------- 核心：汉字「構」骨架系统 (笔画独立Mesh组) ----------
+    // 为了实现“有骨架”，将構字拆解为 木 + 右边 (上部+下部) 模拟三大笔画组
+    // 使用圆柱体、立方体组合抽象但锋利的几何骨骼，每个部分独立
+    const strokeGroup = new THREE.Group();
     
+    // 定义笔画颜色材质 (金属质感)
+    const boneMaterial = new THREE.MeshStandardMaterial({ color: 0xd99e6e, metalness: 0.85, roughness: 0.25, emissive: 0x331100 });
+    const highlightMaterial = new THREE.MeshStandardMaterial({ color: 0xff6644, metalness: 0.9, emissive: 0x441100 });
+    
+    // 1. 木部: 竖 + 横 + 撇捺抽象
+    const verticalWood = new THREE.Mesh(new THREE.BoxGeometry(0.28, 1.6, 0.28), boneMaterial);
+    verticalWood.position.set(-1.0, 0.2, 0);
+    strokeGroup.add(verticalWood);
+    const horizWood = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.22, 0.28), boneMaterial);
+    horizWood.position.set(-1.0, -0.2, 0);
+    strokeGroup.add(horizWood);
+    const leftSlant = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.9, 6), boneMaterial);
+    leftSlant.rotation.z = 0.6;
+    leftSlant.position.set(-1.45, 0.05, 0);
+    strokeGroup.add(leftSlant);
+    const rightSlant = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.9, 6), boneMaterial);
+    rightSlant.rotation.z = -0.6;
+    rightSlant.position.set(-0.5, 0.05, 0);
+    strokeGroup.add(rightSlant);
+    
+    // 2. 右上结构 (青+ 甘)
+    const topRight = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.22, 0.25), boneMaterial);
+    topRight.position.set(0.55, 0.75, 0);
+    strokeGroup.add(topRight);
+    const midRight = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.22, 0.25), boneMaterial);
+    midRight.position.set(0.55, 0.25, 0);
+    strokeGroup.add(midRight);
+    const verticalRight = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.1, 0.25), boneMaterial);
+    verticalRight.position.set(1.0, 0.25, 0);
+    strokeGroup.add(verticalRight);
+    
+    // 3. 底部“冉”的抽象: 方框感
+    const bottomLeft = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.22, 0.28), boneMaterial);
+    bottomLeft.position.set(-0.2, -0.55, 0);
+    strokeGroup.add(bottomLeft);
+    const bottomRight = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.22, 0.28), boneMaterial);
+    bottomRight.position.set(0.65, -0.55, 0);
+    strokeGroup.add(bottomRight);
+    const centerV = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.28), boneMaterial);
+    centerV.position.set(0.2, -0.25, 0);
+    strokeGroup.add(centerV);
+    
+    // 增加一些斜撑，体现建筑结构
+    const diagBrace = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.2, 4), boneMaterial);
+    diagBrace.rotation.z = 0.9;
+    diagBrace.position.set(0.4, -0.1, 0.2);
+    strokeGroup.add(diagBrace);
+    
+    scene.add(strokeGroup);
+    strokeGroup.position.set(0, 0.5, 0);
+    
+    // 添加悬浮光晕粒子环绕笔画
+    const glowGeometry = new THREE.BufferGeometry();
+    const glowCount = 800;
+    const glowPos = [];
+    for(let i=0;i<glowCount;i++) {
+        glowPos.push((Math.random() - 0.5) * 2.8);
+        glowPos.push((Math.random() - 0.5) * 2.2);
+        glowPos.push((Math.random() - 0.5) * 1.5);
+    }
+    glowGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(glowPos), 3));
+    const glowPoints = new THREE.Points(glowGeometry, new THREE.PointsMaterial({ color: 0xff8866, size: 0.02, transparent: true, blending: THREE.AdditiveBlending }));
+    strokeGroup.add(glowPoints);
+    
+    // 存储每个独立笔画Mesh以便动画 (用于后期AI映射变形)
+    const strokeMeshes = [verticalWood, horizWood, leftSlant, rightSlant, topRight, midRight, verticalRight, bottomLeft, bottomRight, centerV, diagBrace];
+    
+    // 添加鼠标交互：笔画根据鼠标位置产生偏移（骨架感应）
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+        // 让笔画组整体轻微倾斜
+        gsap.to(strokeGroup.rotation, { duration: 0.5, y: mouseX * 0.15, x: -mouseY * 0.1, ease: "power2.out" });
+        // 独立笔画弹性偏移 (模拟骨架受力)
+        strokeMeshes.forEach((mesh, idx) => {
+            const intensity = Math.sqrt(mouseX*mouseX + mouseY*mouseY);
+            const offsetX = mouseX * 0.08 * (idx % 3) / 2;
+            const offsetY = mouseY * 0.06 * (idx % 2);
+            gsap.to(mesh.position, { duration: 0.3, x: mesh.userData.originX + offsetX, y: mesh.userData.originY + offsetY, ease: "power1.out" });
+        });
+    });
+    
+    // 存储原始位置
+    strokeMeshes.forEach(mesh => {
+        mesh.userData.originX = mesh.position.x;
+        mesh.userData.originY = mesh.position.y;
+    });
+    
+    // 添加环绕的CSS标签 (骨架说明)
+    // 简单添加三个浮动光柱
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xff4433 });
+    for(let i=0;i<12;i++) {
+        const points = [];
+        points.push(new THREE.Vector3(0, -1.2, 0));
+        points.push(new THREE.Vector3(Math.sin(i)*1.2, -0.8, Math.cos(i)*1.2));
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+        const lineObj = new THREE.Line(lineGeo, lineMat);
+        scene.add(lineObj);
+    }
+    
+    // 动画循环
     let time = 0;
-    function animateScene() {
-        requestAnimationFrame(animateScene);
-        time += 0.005;
-        particles.rotation.y = Math.sin(time * 0.1) * 0.1;
-        particles.rotation.x = Math.sin(time * 0.07) * 0.05;
-        camera.lookAt(0, 0.5, 0);
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.008;
+        particles.rotation.y = Math.sin(time * 0.1) * 0.07;
+        particles.rotation.x = Math.sin(time * 0.13) * 0.05;
+        glowPoints.rotation.y += 0.005;
+        glowPoints.rotation.x = Math.sin(time) * 0.1;
+        
+        camera.lookAt(0, 0.4, 0);
         renderer.render(scene, camera);
     }
-    animateScene();
+    animate();
     
-    // 窗口尺寸适配
-    window.addEventListener('resize', onWindowResize, false);
-    function onWindowResize() {
+    // 窗口自适应
+    window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    // ---------- AI审图映射：让特定笔画变形(骨架错动) ----------
+    function applyCodeViolation(type) {
+        // 根据违规类型扭曲对应笔画 (模拟建筑结构变形)
+        strokeMeshes.forEach(m => {
+            gsap.killTweensOf(m.position);
+            gsap.to(m.position, { duration: 0.4, x: m.userData.originX, y: m.userData.originY, ease: "elastic.out(0.8,0.3)" });
+        });
+        if(type === 'distance') {
+            // 疏散距离违规 -> 底部右侧笔画下沉位移
+            gsap.to(bottomRight.position, { duration: 0.5, y: -0.35, x: 0.15, ease: "back.inOut" });
+            gsap.to(centerV.position, { duration: 0.5, y: -0.4, ease: "power2" });
+            setTimeout(() => {
+                gsap.to(bottomRight.position, { duration: 0.6, y: bottomRight.userData.originY, x: bottomRight.userData.originX, ease: "bounce.out" });
+                gsap.to(centerV.position, { duration: 0.6, y: centerV.userData.originY });
+            }, 1200);
+        } else if(type === 'fire') {
+            // 消防问题，火字形变: 使上部红色高亮并扭曲
+            gsap.to(topRight.material, { duration: 0.2, color: 0xff3300, emissiveIntensity: 0.7, yoyo: true, repeat: 3 });
+            gsap.to(verticalRight.position, { x: 0.25, duration: 0.3, yoyo: true, repeat: 2 });
+        }
     }
     
-    // ---------- 第一屏鼠标交互：汉字变形 GSAP 和 CSS Transform ----------
-    const heroH1 = document.getElementById('heroChar');
-    document.addEventListener('mousemove', (e) => {
-        const winW = window.innerWidth, winH = window.innerHeight;
-        const centerX = winW / 2, centerY = winH / 2;
-        let deltaX = (e.clientX - centerX) / centerX;  // -1..1
-        let deltaY = (e.clientY - centerY) / centerY;
-        deltaX = Math.min(Math.max(deltaX, -1), 1);
-        deltaY = Math.min(Math.max(deltaY, -1), 1);
-        const intensity = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
-        const skewX = deltaX * 18;
-        const scaleX = 1 + Math.abs(deltaX) * 0.35;
-        const letterSpacing = deltaX * 12;
-        const colorVal = 200 + Math.floor(Math.abs(deltaX) * 55);
-        gsap.to(heroH1, {
-            duration: 0.4,
-            ease: "power2.out",
-            skewX: skewX,
-            scaleX: scaleX,
-            letterSpacing: `${letterSpacing}px`,
-            color: `rgb(255, ${80 + Math.abs(deltaX)*70}, ${40 + Math.abs(deltaX)*30})`,
-            textShadow: `0 0 ${15 + Math.abs(deltaX)*18}px rgba(255,80,0,0.8)`,
-        });
-    });
-    
-    // 第二屏悬停3D效果模拟CAD浮现：通过添加临时浮动层和GSAP动画
-    const cards = document.querySelectorAll('.char-card');
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            const cadHint = card.getAttribute('data-cad');
-            const bigCharSpan = card.querySelector('.big-char');
-            gsap.to(card, { duration: 0.25, borderColor: '#ff7a4a', boxShadow: '0 0 35px rgba(255,80,0,0.6)' });
-            // 模拟建筑线框浮现 (在卡片内增加临时视觉)
-            let overlayDiv = card.querySelector('.cad-overlay');
-            if(!overlayDiv){
-                overlayDiv = document.createElement('div');
-                overlayDiv.className = 'cad-overlay';
-                overlayDiv.style.position = 'absolute';
-                overlayDiv.style.bottom = '10px';
-                overlayDiv.style.left = '10px';
-                overlayDiv.style.fontSize = '10px';
-                overlayDiv.style.backgroundColor = '#ff3a2a30';
-                overlayDiv.style.padding = '4px 8px';
-                overlayDiv.style.borderRadius = '20px';
-                overlayDiv.style.backdropFilter = 'blur(4px)';
-                overlayDiv.innerText = cadHint;
-                card.style.position = 'relative';
-                card.appendChild(overlayDiv);
-            } else overlayDiv.innerText = cadHint;
-        });
-        card.addEventListener('mouseleave', () => {
-            gsap.to(card, { duration: 0.3, borderColor: 'rgba(255,80,40,0.3)', boxShadow: 'none' });
-            const overlay = card.querySelector('.cad-overlay');
-            if(overlay) overlay.remove();
-        });
-    });
-    
-    // ---------- 第三屏 AI 模拟审图 (模拟检测错误) ----------
+    // ---------- 第三屏 AI 模拟上传扫描 ----------
     const uploadZone = document.getElementById('uploadZone');
     const fileInput = document.getElementById('fileInput');
-    const previewContainer = document.getElementById('previewContainer');
-    const scanResultDiv = document.getElementById('scanResult');
+    const previewDiv = document.getElementById('previewContainer');
+    const scanMsgDiv = document.getElementById('scanMsg');
     
     uploadZone.addEventListener('click', () => fileInput.click());
     uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.style.background = '#ff4a2a20'; });
-    uploadZone.addEventListener('dragleave', () => uploadZone.style.background = 'rgba(0,0,0,0.4)');
+    uploadZone.addEventListener('dragleave', () => uploadZone.style.background = 'transparent');
     uploadZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        uploadZone.style.background = 'rgba(0,0,0,0.4)';
-        const file = e.dataTransfer.files[0];
-        if(file) processFile(file);
+        uploadZone.style.background = 'transparent';
+        if(e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
     });
-    fileInput.addEventListener('change', (e) => {
-        if(fileInput.files.length) processFile(fileInput.files[0]);
-    });
+    fileInput.addEventListener('change', (e) => { if(fileInput.files[0]) processFile(fileInput.files[0]); });
     
     function processFile(file) {
-        if(!file.type.startsWith('image/')) {
-            scanResultDiv.innerText = '⚠️ 演示模式: 仅支持图像预览，模拟扫描中... 发现风险: 防火墙不连续 | 疏散距离超标';
-            previewContainer.innerHTML = '<div style="padding:1rem;border:1px solid #ff3a2a;border-radius:20px;">📄 PDF 模拟审图: 识别到2处规范冲突( 红色标注 )</div>';
-            addMockErrors();
-            return;
+        if(file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = document.createElement('img');
+                img.src = ev.target.result;
+                img.className = 'preview-img';
+                previewDiv.innerHTML = '';
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.appendChild(img);
+                previewDiv.appendChild(wrapper);
+                // 模拟错误标注
+                const mark = document.createElement('div');
+                mark.className = 'error-mark';
+                mark.style.top = '28%';
+                mark.style.left = '18%';
+                mark.style.width = '30%';
+                mark.style.height = '22%';
+                wrapper.appendChild(mark);
+                scanMsgDiv.innerHTML = '⚠️ 扫描完成: 疏散距离不足 + 防火分区越界 → 汉字骨架变形响应';
+                applyCodeViolation('distance');
+                setTimeout(() => mark.remove(), 3500);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewDiv.innerHTML = '<div style="padding:1rem">📄 模拟PDF审图: 检测到2处规范违反，正在触发字形重构...</div>';
+            scanMsgDiv.innerHTML = '🔴 红色动态描边: 防火墙不连续，触发「構」字底部偏移';
+            applyCodeViolation('fire');
         }
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const img = document.createElement('img');
-            img.src = ev.target.result;
-            img.className = 'preview-img';
-            previewContainer.innerHTML = '';
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'relative';
-            wrapper.appendChild(img);
-            previewContainer.appendChild(wrapper);
-            // 模拟两个错误标注框
-            setTimeout(() => {
-                addMockErrorsOnImg(wrapper);
-                scanResultDiv.innerText = '✓ 扫描完成 | 发现2处不符合: ① 疏散门间距不足 ② 防火分区超限 (红色标记区域)';
-            }, 800);
-        };
-        reader.readAsDataURL(file);
     }
-    function addMockErrorsOnImg(parent) {
-        const mark1 = document.createElement('div');
-        mark1.className = 'error-mark';
-        mark1.style.top = '25%';
-        mark1.style.left = '15%';
-        mark1.style.width = '28%';
-        mark1.style.height = '18%';
-        const mark2 = document.createElement('div');
-        mark2.className = 'error-mark';
-        mark2.style.bottom = '30%';
-        mark2.style.right = '12%';
-        mark2.style.width = '35%';
-        mark2.style.height = '15%';
-        parent.style.position = 'relative';
-        parent.appendChild(mark1);
-        parent.appendChild(mark2);
-        setTimeout(() => { mark1.remove(); mark2.remove(); }, 4000);
-    }
-    function addMockErrors() { scanResultDiv.innerHTML += '<span style="display:block;margin-top:8px;">🔴 红色动态描边: 疏散路径错误 / 防火墙未闭合</span>'; }
     
-    // 第四屏 拖拽重组 模拟组合“構”
-    const dragItems = document.querySelectorAll('.drag-item');
-    const assemblyZoneDiv = document.getElementById('assemblyZone');
-    let combinedParts = [];
-    dragItems.forEach(item => {
-        item.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', item.getAttribute('data-part'));
-            e.dataTransfer.effectAllowed = 'copy';
+    // 第四屏 拖拽重组
+    const dragParts = document.querySelectorAll('.drag-part');
+    const assemblyDiv = document.getElementById('assemblyZone');
+    let combined = [];
+    dragParts.forEach(part => {
+        part.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', part.getAttribute('data-part'));
         });
     });
-    assemblyZoneDiv.addEventListener('dragover', (e) => e.preventDefault());
-    assemblyZoneDiv.addEventListener('drop', (e) => {
+    assemblyDiv.addEventListener('dragover', (e) => e.preventDefault());
+    assemblyDiv.addEventListener('drop', (e) => {
         e.preventDefault();
-        const part = e.dataTransfer.getData('text/plain');
-        if(part && !combinedParts.includes(part)){
-            combinedParts.push(part);
-            if(combinedParts.length === 3) {
-                assemblyZoneDiv.innerHTML = '構';
-                assemblyZoneDiv.style.fontSize = '6rem';
-                assemblyZoneDiv.style.color = '#ff8866';
-                document.getElementById('generatedPlan').innerHTML = '🏛️ 参数建筑空间生成: 木+门+火 = 「構」 结构骨架 · 东方参数化平面已激活';
-                gsap.to(assemblyZoneDiv, { scale: 1.1, duration: 0.3, yoyo: true, repeat: 1 });
+        const val = e.dataTransfer.getData('text/plain');
+        if(val && !combined.includes(val)) {
+            combined.push(val);
+            if(combined.length === 3) {
+                assemblyDiv.innerHTML = '構';
+                document.getElementById('genResult').innerHTML = '✓ 参数建筑空间激活：「木+门+火」生成「構」 结构骨架稳定 · 空间网格已映射';
+                gsap.to(assemblyDiv, { scale: 1.1, duration: 0.2, yoyo: true, repeat: 1 });
+                // 同时强化3D笔画组的金属质感
+                strokeMeshes.forEach(m => m.material.emissiveIntensity = 0.25);
+                setTimeout(() => strokeMeshes.forEach(m => m.material.emissiveIntensity = 0), 800);
             } else {
-                assemblyZoneDiv.innerHTML = combinedParts.join(' + ');
+                assemblyDiv.innerHTML = combined.join(' + ');
             }
         }
     });
     
-    // 全局自定义光标跟移
+    // 第二屏卡片悬停联动 3D 笔画高亮
+    const cards = document.querySelectorAll('.char-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            const highlightIdx = card.innerText.includes('構') ? 5 : 0;
+            gsap.to(strokeMeshes[highlightIdx]?.material || strokeMeshes[0].material, { duration: 0.2, emissiveIntensity: 0.5, color: 0xff8855 });
+        });
+        card.addEventListener('mouseleave', () => {
+            strokeMeshes.forEach(m => m.material.emissiveIntensity = 0);
+        });
+    });
+    
+    // 光标
     const cursorDiv = document.getElementById('cursor');
     document.addEventListener('mousemove', (e) => {
-        gsap.to(cursorDiv, { duration: 0.08, x: e.clientX - 10, y: e.clientY - 10 });
+        gsap.to(cursorDiv, { duration: 0.05, x: e.clientX - 12, y: e.clientY - 12 });
     });
-    document.addEventListener('mouseenter', () => cursorDiv.style.opacity = 1);
-    document.addEventListener('mouseleave', () => cursorDiv.style.opacity = 0);
     
-    // 平滑滚动 GSAP 触发相机视角微动，创建空间感
-    let scrollTimeout;
+    // 滚动相机动效
+    let lastScroll = 0;
     window.addEventListener('scroll', () => {
         const scrollY = window.scrollY;
-        const maxScroll = document.body.scrollHeight - window.innerHeight;
-        const progress = scrollY / maxScroll;
-        // 基于滚动轻微移动相机视点产生景深感
-        gsap.to(camera.position, { duration: 0.8, z: 12 - progress * 1.5, y: 2 + progress * 0.6, ease: "power1.out" });
-        // 粒子略微浮动
+        const progress = Math.min(scrollY / (document.body.scrollHeight - window.innerHeight), 1);
+        camera.position.z = 8.5 - progress * 1.2;
+        camera.position.y = 1.2 + progress * 0.8;
         particles.rotation.z = progress * 0.5;
     });
     
-    // 首屏进入后动画强化
-    gsap.fromTo(heroH1, { opacity: 0, filter: "blur(12px)" }, { opacity: 1, filter: "blur(0px)", duration: 1.5, delay: 0.2 });
-    
-    // 额外给各个屏幕的滚动进入动效
-    const sections = document.querySelectorAll('section');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if(entry.isIntersecting){
-                gsap.fromTo(entry.target.children, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1 });
-            }
-        });
-    }, { threshold: 0.2 });
-    sections.forEach(sec => observer.observe(sec));
-    
-    // 增加微小悬浮粒子光晕 (点缀)
-    console.log('东方汉字空间实验室已启动 · 建筑与字符共生');
+    console.log('汉字骨架系统已启动 — 笔画独立响应，建筑逻辑映射字形');
 </script>
 </body>
 </html>
