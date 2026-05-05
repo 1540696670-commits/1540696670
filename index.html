@@ -1,143 +1,129 @@
-export default function CinematicArchitectureWebsite() {
+export default function OrientalArchitectureLab() {
+  const hanzi = ['構', '城', '門', '火', '井', '人']
+
   return (
-    <div className="bg-[#030303] text-white overflow-hidden selection:bg-white selection:text-black">
-      {/* GLOBAL BACKGROUND */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[1200px] h-[1200px] rounded-full bg-cyan-400/[0.03] blur-3xl animate-pulse" />
-        <div className="absolute bottom-[-30%] right-[-10%] w-[1200px] h-[1200px] rounded-full bg-white/[0.03] blur-3xl" />
+    <div className="min-h-screen bg-black text-white overflow-hidden selection:bg-white selection:text-black">
+      {/* BACKGROUND */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_60%)]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[1000px] h-[1000px] rounded-full bg-white/[0.03] blur-3xl" />
+        <div className="absolute bottom-[-30%] right-[-10%] w-[1000px] h-[1000px] rounded-full bg-cyan-400/[0.04] blur-3xl" />
       </div>
 
-      {/* NAV */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-10 py-8 backdrop-blur-xl bg-black/10 border-b border-white/5">
-        <div className="max-w-[1700px] mx-auto flex items-center justify-between">
-          <div>
-            <div className="text-sm tracking-[0.45em] uppercase text-white/60">
-              AI Architecture
-            </div>
+      {/* NAVIGATION */}
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl bg-black/20 border-b border-white/10">
+        <div className="max-w-[1800px] mx-auto px-10 py-8 flex items-center justify-between">
+          <div className="text-sm uppercase tracking-[0.45em] text-white/60">
+            Oriental Architecture Intelligence Lab
           </div>
 
-          <div className="hidden md:flex items-center gap-10 text-sm tracking-[0.25em] uppercase text-white/45">
-            <div className="hover:text-white transition-colors cursor-pointer">
-              Platform
-            </div>
-            <div className="hover:text-white transition-colors cursor-pointer">
-              Intelligence
-            </div>
-            <div className="hover:text-white transition-colors cursor-pointer">
-              Projects
-            </div>
-            <div className="hover:text-white transition-colors cursor-pointer">
-              Contact
-            </div>
+          <div className="hidden lg:flex gap-12 text-sm uppercase tracking-[0.25em] text-white/40">
+            <div className="hover:text-white transition-colors cursor-pointer">Hanzi Space</div>
+            <div className="hover:text-white transition-colors cursor-pointer">AI Review</div>
+            <div className="hover:text-white transition-colors cursor-pointer">Architecture Logic</div>
+            <div className="hover:text-white transition-colors cursor-pointer">PDF System</div>
           </div>
         </div>
       </header>
 
       {/* HERO */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover opacity-40 scale-105"
-            src="https://cdn.coverr.co/videos/coverr-modern-architecture-1560927706996?download=1080p"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/30" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent,black)]" />
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-[42vw] leading-none font-thin text-white/[0.05] tracking-[-0.12em] animate-pulse select-none">
+            構
+          </div>
         </div>
 
-        <div className="relative z-10 max-w-[1700px] mx-auto w-full px-10 pt-32">
-          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-16 items-center">
-            <div>
-              <div className="mb-10 inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-2xl text-xs tracking-[0.35em] uppercase text-white/60">
-                Future Architectural Intelligence System
-              </div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:80px_80px] opacity-30" />
 
-              <h1 className="text-[90px] md:text-[150px] xl:text-[220px] leading-[0.82] font-extralight tracking-[-0.08em] mb-10">
-                AI
-                <br />
-                SPACE
-                <br />
-                FUTURE
-              </h1>
-
-              <div className="max-w-2xl text-white/50 text-xl leading-10 font-light mb-14">
-                面向规划、建筑与城市设计行业的新一代 AI 建筑智能平台。
-                自动审查 PDF 图纸、识别规范错误、分析消防逻辑与空间关系。
-              </div>
-
-              <div className="flex flex-wrap gap-5">
-                <button className="group relative overflow-hidden px-10 py-5 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-all duration-700">
-                  <span className="relative z-10">Upload Drawings</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-white to-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                </button>
-
-                <button className="px-10 py-5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-2xl text-lg hover:bg-white/[0.08] transition-all duration-700">
-                  Watch Experience
-                </button>
-              </div>
+        <div className="relative z-10 max-w-[1800px] mx-auto px-10 w-full grid lg:grid-cols-[1fr_0.9fr] gap-24 items-center pt-24">
+          <div>
+            <div className="mb-8 inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-2xl uppercase tracking-[0.35em] text-xs text-white/55">
+              Hanzi × Architecture × AI
             </div>
 
-            <div className="relative flex items-center justify-center">
-              <div className="absolute w-[900px] h-[900px] rounded-full border border-white/5 animate-spin [animation-duration:50s]" />
-              <div className="absolute w-[700px] h-[700px] rounded-full border border-cyan-400/10 animate-spin [animation-duration:25s] [animation-direction:reverse]" />
+            <h1 className="text-[90px] md:text-[160px] xl:text-[230px] leading-[0.78] tracking-[-0.1em] font-extralight mb-10">
+              東方
+              <br />
+              空間
+              <br />
+              智能
+            </h1>
 
-              <div className="relative w-[680px] aspect-[0.85] rounded-[60px] overflow-hidden border border-white/10 backdrop-blur-3xl bg-white/[0.03] rotate-[8deg] hover:rotate-0 transition-all duration-1000 shadow-[0_0_120px_rgba(255,255,255,0.06)]">
+            <div className="max-w-2xl text-white/50 text-xl leading-10 font-light mb-14">
+              将中国汉字结构、建筑空间逻辑与 AI 智能审图融合。
+              不是一个普通网站，而是一座“数字汉字建筑实验室”。
+            </div>
+
+            <div className="flex flex-wrap gap-5">
+              <button className="px-10 py-5 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-all duration-700">
+                Enter Space
+              </button>
+
+              <button className="px-10 py-5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-2xl text-lg hover:bg-white/[0.08] transition-all duration-700">
+                Upload Drawings
+              </button>
+            </div>
+          </div>
+
+          <div className="relative flex items-center justify-center">
+            <div className="absolute w-[900px] h-[900px] rounded-full border border-white/5 animate-spin [animation-duration:60s]" />
+            <div className="absolute w-[700px] h-[700px] rounded-full border border-cyan-400/10 animate-spin [animation-duration:24s] [animation-direction:reverse]" />
+
+            <div className="relative w-[720px] aspect-square rounded-[60px] overflow-hidden border border-white/10 bg-white/[0.03] backdrop-blur-3xl shadow-[0_0_120px_rgba(255,255,255,0.08)] rotate-[7deg] hover:rotate-0 transition-all duration-1000">
+              <div className="absolute inset-0">
                 <img
                   src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2070&auto=format&fit=crop"
-                  className="absolute inset-0 w-full h-full object-cover opacity-55"
+                  className="w-full h-full object-cover opacity-35 scale-105"
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/90" />
+                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/90" />
+              </div>
 
-                <div className="relative z-10 h-full p-10 flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-3">
-                        AI Analysis
-                      </div>
-
-                      <div className="text-5xl font-extralight tracking-tight leading-tight">
-                        Shenzhen
-                        <br />
-                        Headquarters
-                      </div>
+              <div className="relative z-10 h-full p-10 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-3">
+                      AI Spatial Review
                     </div>
 
-                    <div className="w-4 h-4 rounded-full bg-emerald-400 animate-pulse" />
+                    <div className="text-5xl font-extralight leading-tight tracking-tight">
+                      Hanzi
+                      <br />
+                      Architecture
+                    </div>
                   </div>
 
-                  <div className="space-y-5">
-                    <div className="rounded-[34px] border border-red-400/15 bg-red-500/10 backdrop-blur-xl p-7">
-                      <div className="uppercase tracking-[0.25em] text-xs text-red-300 mb-4">
-                        Fire Regulation Error
-                      </div>
+                  <div className="w-4 h-4 rounded-full bg-emerald-400 animate-pulse" />
+                </div>
 
-                      <div className="text-3xl font-light mb-3">
-                        疏散距离超限
-                      </div>
+                <div className="space-y-5">
+                  <div className="rounded-[32px] border border-red-400/15 bg-red-500/10 backdrop-blur-xl p-7">
+                    <div className="uppercase tracking-[0.25em] text-xs text-red-300 mb-4">
+                      AI Regulation Error
+                    </div>
 
-                      <div className="text-white/55 leading-8">
-                        AI 自动检测到疏散距离超过规范允许值 5.2m。
+                    <div className="text-3xl font-light mb-3">
+                      疏散距离超限
+                    </div>
+
+                    <div className="text-white/55 leading-8">
+                      自动关联《建筑设计防火规范》GB50016 第5.5.17条。
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-5">
+                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+                      <div className="text-6xl font-extralight mb-4">12</div>
+                      <div className="uppercase tracking-[0.2em] text-xs text-white/45">
+                        AI Issues
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-5">
-                      <div className="rounded-[30px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6">
-                        <div className="text-6xl font-extralight mb-4">12</div>
-                        <div className="text-white/45 uppercase tracking-[0.2em] text-xs">
-                          AI Issues
-                        </div>
-                      </div>
-
-                      <div className="rounded-[30px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6">
-                        <div className="text-6xl font-extralight mb-4">98%</div>
-                        <div className="text-white/45 uppercase tracking-[0.2em] text-xs">
-                          Recognition
-                        </div>
+                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+                      <div className="text-6xl font-extralight mb-4">10</div>
+                      <div className="uppercase tracking-[0.2em] text-xs text-white/45">
+                        Hanzi Levels
                       </div>
                     </div>
                   </div>
@@ -148,115 +134,59 @@ export default function CinematicArchitectureWebsite() {
         </div>
       </section>
 
-      {/* FLOATING IMAGE WALL */}
-      <section className="relative py-40 overflow-hidden border-y border-white/5">
-        <div className="flex gap-10 w-max animate-[scroll_60s_linear_infinite] px-10">
-          {[
-            'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1200&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1460317442991-0ec209397118?q=80&w=1200&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1529429617124-aee711a5ac1c?q=80&w=1200&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop',
-          ].map((src, i) => (
-            <div
-              key={i}
-              className="group relative w-[700px] h-[440px] rounded-[50px] overflow-hidden border border-white/10 shrink-0"
-            >
-              <img
-                src={src}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]"
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-
-              <div className="absolute bottom-10 left-10">
-                <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-4">
-                  Architecture Intelligence
-                </div>
-
-                <div className="text-5xl font-extralight tracking-tight max-w-md leading-tight">
-                  AI Spatial Review System
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section className="relative py-44 px-10">
-        <div className="max-w-[1700px] mx-auto">
+      {/* HANZI STRUCTURE */}
+      <section className="relative py-44 border-y border-white/10 overflow-hidden">
+        <div className="max-w-[1800px] mx-auto px-10">
           <div className="grid lg:grid-cols-2 gap-24 mb-28 items-end">
             <div>
               <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-6">
-                AI Capability
+                Hanzi Spatial Logic
               </div>
 
-              <h2 className="text-[80px] leading-[0.9] font-extralight tracking-[-0.06em]">
-                Beyond
+              <h2 className="text-[90px] leading-[0.88] tracking-[-0.06em] font-extralight">
+                Hanzi
                 <br />
-                Traditional
+                Is
                 <br />
-                Review
+                Architecture
               </h2>
             </div>
 
             <div className="text-white/50 text-2xl leading-[2.2] font-light max-w-2xl">
-              AI 自动识别建筑逻辑、消防问题、文本冲突与空间关系。
-              通过规范数据库与规则引擎实现真正的智能审图。
+              汉字不仅是文字，更是东方的空间结构系统。
+              每一个偏旁、每一笔画，都对应建筑、城市与秩序。
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-            {[
-              {
-                title: 'PDF Intelligence',
-                desc: '自动识别建筑 PDF 图纸中的空间、文字与结构关系。',
-                img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop',
-              },
-              {
-                title: 'AI Regulation',
-                desc: '自动匹配 GB50016 等国家规范与地方规范。',
-                img: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=1200&auto=format&fit=crop',
-              },
-              {
-                title: 'Spatial Logic',
-                desc: '识别疏散、防火、面积与建筑空间逻辑错误。',
-                img: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1200&auto=format&fit=crop',
-              },
-              {
-                title: 'Text Recognition',
-                desc: 'OCR 自动识别文本错误、编号问题与规范冲突。',
-                img: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop',
-              },
-            ].map((item) => (
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {hanzi.map((char, index) => (
               <div
-                key={item.title}
-                className="group relative h-[620px] rounded-[50px] overflow-hidden border border-white/10"
+                key={index}
+                className="group relative h-[520px] rounded-[50px] overflow-hidden border border-white/10 bg-white/[0.03] backdrop-blur-2xl hover:bg-white/[0.05] transition-all duration-1000"
               >
-                <img
-                  src={item.img}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1800ms]"
-                />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_60%)]" />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-
-                <div className="absolute inset-0 p-8 flex flex-col justify-between">
-                  <div className="w-16 h-16 rounded-full border border-white/20 bg-white/[0.04] backdrop-blur-xl flex items-center justify-center text-xl">
-                    ✦
+                <div className="relative z-10 h-full flex flex-col justify-between p-10">
+                  <div className="text-[180px] leading-none font-thin text-white/10 group-hover:scale-110 transition-transform duration-1000">
+                    {char}
                   </div>
 
                   <div>
                     <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-5">
-                      AI Architecture
+                      Hanzi Mechanism
                     </div>
 
-                    <div className="text-5xl leading-tight font-extralight tracking-tight mb-6">
-                      {item.title}
+                    <div className="text-6xl font-extralight tracking-tight mb-6 leading-none">
+                      {char}
                     </div>
 
-                    <div className="text-white/55 leading-9 text-lg">
-                      {item.desc}
+                    <div className="text-white/55 text-lg leading-9">
+                      {char === '門' && '门，是空间的入口，是建筑最初的界面。'}
+                      {char === '火' && '火，是消防规范，是安全秩序的核心逻辑。'}
+                      {char === '井' && '井，是城市网格，是秩序与结构系统。'}
+                      {char === '城' && '城，是城市边界，是空间组织体系。'}
+                      {char === '人' && '人，是建筑动线，是空间体验主体。'}
+                      {char === '構' && '構，是建筑构件，是东方结构哲学。'}
                     </div>
                   </div>
                 </div>
@@ -266,149 +196,153 @@ export default function CinematicArchitectureWebsite() {
         </div>
       </section>
 
-      {/* UPLOAD EXPERIENCE */}
-      <section className="relative py-44 border-y border-white/5 overflow-hidden">
+      {/* AI REVIEW */}
+      <section className="relative py-44 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2070&auto=format&fit=crop"
-            className="w-full h-full object-cover opacity-10 scale-105"
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+            className="w-full h-full object-cover opacity-10"
           />
         </div>
 
-        <div className="relative z-10 max-w-[1700px] mx-auto px-10 grid lg:grid-cols-[0.9fr_1.1fr] gap-24 items-center">
-          <div>
-            <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-6">
-              Upload Workflow
+        <div className="relative z-10 max-w-[1800px] mx-auto px-10">
+          <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-24 items-center mb-28">
+            <div>
+              <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-6">
+                AI Building Review System
+              </div>
+
+              <h2 className="text-[90px] leading-[0.88] tracking-[-0.06em] font-extralight mb-14">
+                Upload
+                <br />
+                Analyze
+                <br />
+                Detect
+              </h2>
+
+              <div className="space-y-10">
+                {[
+                  'PDF / CAD 图纸上传',
+                  'OCR 自动文本识别',
+                  'AI 建筑逻辑检测',
+                  '规范条文自动匹配',
+                  '违规区域高亮分析',
+                ].map((item, i) => (
+                  <div key={item} className="flex gap-7 items-start">
+                    <div className="w-16 h-16 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-white/55 backdrop-blur-xl">
+                      {i + 1}
+                    </div>
+
+                    <div className="text-3xl font-extralight tracking-tight text-white/75 pt-3 leading-tight">
+                      {item}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <h2 className="text-[90px] leading-[0.88] font-extralight tracking-[-0.06em] mb-16">
-              Upload
-              <br />
-              Analyze
-              <br />
-              Generate
-            </h2>
+            <div className="relative rounded-[60px] overflow-hidden border border-white/10 bg-white/[0.03] backdrop-blur-3xl shadow-[0_0_120px_rgba(255,255,255,0.06)]">
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-            <div className="space-y-10">
-              {[
-                '上传 PDF / CAD 图纸',
-                'OCR 自动识别文本',
-                'AI 提取建筑构件',
-                '规范规则自动匹配',
-                '输出 AI 审查报告',
-              ].map((step, i) => (
-                <div key={step} className="flex gap-7 items-start">
-                  <div className="w-16 h-16 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-xl flex items-center justify-center text-white/55">
-                    {i + 1}
+              <div className="relative z-10 p-10">
+                <div className="border-2 border-dashed border-white/15 rounded-[40px] p-28 text-center hover:border-cyan-400/40 transition-all duration-1000 group cursor-pointer">
+                  <div className="text-[160px] font-thin mb-10 group-hover:scale-110 transition-transform duration-700">
+                    +
                   </div>
 
-                  <div className="text-3xl font-extralight tracking-tight text-white/75 leading-tight pt-3">
-                    {step}
+                  <div className="text-5xl font-extralight tracking-tight mb-6">
+                    Drop PDF Drawings
                   </div>
+
+                  <div className="text-white/50 text-xl leading-10 max-w-2xl mx-auto mb-12 font-light">
+                    支持 PDF.js 在线解析、IndexedDB 本地规范存储与 AI 实时审图。
+                  </div>
+
+                  <button className="px-12 py-6 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-transform duration-700">
+                    Select Drawings
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="absolute inset-0 blur-3xl bg-cyan-400/10 rounded-full" />
+          {/* REVIEW VISUAL */}
+          <div className="rounded-[60px] overflow-hidden border border-white/10 bg-white/[0.03] backdrop-blur-3xl">
+            <div className="grid lg:grid-cols-[1fr_380px] min-h-[820px]">
+              <div className="relative overflow-hidden flex items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-            <div className="relative rounded-[60px] border border-white/10 bg-white/[0.03] backdrop-blur-3xl p-10 overflow-hidden shadow-[0_0_120px_rgba(255,255,255,0.06)]">
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+                <div className="relative w-[85%] aspect-[4/3] rounded-[36px] overflow-hidden border border-white/10">
+                  <img
+                    src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1600&auto=format&fit=crop"
+                    className="w-full h-full object-cover opacity-30"
+                  />
 
-              <div className="relative z-10 border-2 border-dashed border-white/15 rounded-[44px] p-28 text-center hover:border-cyan-400/40 transition-all duration-1000 group cursor-pointer">
-                <div className="text-[160px] font-thin mb-10 group-hover:scale-110 transition-transform duration-700">
-                  +
+                  <div className="absolute top-[30%] left-[32%] w-44 h-24 border-2 border-red-400 rounded-2xl animate-pulse" />
+                  <div className="absolute top-[52%] left-[54%] w-36 h-20 border-2 border-yellow-400 rounded-2xl animate-pulse" />
+                </div>
+              </div>
+
+              <div className="border-l border-white/10 p-8 bg-black/20 overflow-y-auto">
+                <div className="uppercase tracking-[0.25em] text-xs text-white/40 mb-4">
+                  AI Report
                 </div>
 
-                <div className="text-5xl font-extralight tracking-tight mb-6">
-                  Drop Your Drawings
+                <div className="text-5xl font-extralight tracking-tight mb-12">
+                  审图结果
                 </div>
 
-                <div className="text-white/50 text-xl leading-10 max-w-2xl mx-auto mb-12 font-light">
-                  支持建筑、规划、消防 PDF 图纸上传与 AI 智能识别。
-                </div>
+                <div className="space-y-6">
+                  {[
+                    '疏散距离超限',
+                    '防火分区错误',
+                    '楼梯净宽不足',
+                    '编号逻辑冲突'
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-[30px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 hover:bg-white/[0.06] transition-all duration-700"
+                    >
+                      <div className="text-2xl font-light mb-4">
+                        {item}
+                      </div>
 
-                <button className="px-12 py-6 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-transform duration-700">
-                  Select Files
-                </button>
+                      <div className="text-white/45 leading-8 mb-5">
+                        自动关联国家建筑规范与 AI 建筑逻辑分析。
+                      </div>
+
+                      <div className="inline-flex px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
+                        High Risk
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="relative py-28 px-10">
-        <div className="max-w-[1700px] mx-auto flex flex-col lg:flex-row justify-between gap-24">
-          <div>
-            <div className="text-[70px] leading-[0.9] font-extralight tracking-[-0.06em] mb-10">
-              AI
-              <br />
-              Architecture
-            </div>
-
-            <div className="text-white/45 leading-10 text-xl max-w-2xl font-light">
-              下一代 AI 建筑设计与智能审图平台。
-              让建筑师真正拥有 AI 协作能力。
-            </div>
+      {/* CULTURE */}
+      <section className="relative py-44 px-10 border-t border-white/10 overflow-hidden">
+        <div className="max-w-[1600px] mx-auto text-center">
+          <div className="uppercase tracking-[0.35em] text-xs text-white/35 mb-8">
+            Oriental Spatial Philosophy
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-16 text-white/45 text-lg">
-            <div>
-              <div className="text-white mb-7 uppercase tracking-[0.2em] text-sm">
-                Platform
-              </div>
-
-              <div className="space-y-5">
-                <div>AI 审图</div>
-                <div>规范数据库</div>
-                <div>OCR</div>
-                <div>PDF 分析</div>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-white mb-7 uppercase tracking-[0.2em] text-sm">
-                Technology
-              </div>
-
-              <div className="space-y-5">
-                <div>GPT-5</div>
-                <div>Next.js</div>
-                <div>Three.js</div>
-                <div>GSAP</div>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-white mb-7 uppercase tracking-[0.2em] text-sm">
-                Enterprise
-              </div>
-
-              <div className="space-y-5">
-                <div>私有化部署</div>
-                <div>BIM 审查</div>
-                <div>团队协作</div>
-                <div>API</div>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-white mb-7 uppercase tracking-[0.2em] text-sm">
-                Contact
-              </div>
-
-              <div className="space-y-5">
-                <div>商业合作</div>
-                <div>技术支持</div>
-                <div>Architecture AI</div>
-                <div>Future Space</div>
-              </div>
-            </div>
+          <div className="text-[68px] md:text-[90px] leading-[1.18] tracking-[-0.05em] font-extralight mb-14">
+            “建筑审图如同汉字解谜——
+            <br />
+            规范是建筑的笔画准则，
+            <br />
+            合规是空间的结构之美。”
           </div>
+
+          <button className="px-14 py-7 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-transform duration-700">
+            Enter Hanzi Puzzle Space
+          </button>
         </div>
-      </footer>
+      </section>
     </div>
   )
 }
