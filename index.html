@@ -1,348 +1,675 @@
-export default function OrientalArchitectureLab() {
-  const hanzi = ['構', '城', '門', '火', '井', '人']
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>东方汉字空间实验室 | 汉字×建筑×AI</title>
+    <!-- Google Fonts 引入支持未来主义的无衬线字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        /* 全局重置与基础样式 - 东方未来主义暗黑基调 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* 提升装置感，部分文本可选择但留白区域避免干扰 */
+        }
 
-  return (
-    <div className="min-h-screen bg-black text-white overflow-hidden selection:bg-white selection:text-black">
-      {/* BACKGROUND */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_60%)]" />
-        <div className="absolute top-[-20%] left-[-10%] w-[1000px] h-[1000px] rounded-full bg-white/[0.03] blur-3xl" />
-        <div className="absolute bottom-[-30%] right-[-10%] w-[1000px] h-[1000px] rounded-full bg-cyan-400/[0.04] blur-3xl" />
-      </div>
+        body {
+            font-family: 'Inter', 'Neue Haas Grotesk', sans-serif;
+            background-color: #000000;
+            color: #e8e6e1;
+            overflow-x: hidden;
+            overscroll-behavior: none;
+        }
 
-      {/* NAVIGATION */}
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl bg-black/20 border-b border-white/10">
-        <div className="max-w-[1800px] mx-auto px-10 py-8 flex items-center justify-between">
-          <div className="text-sm uppercase tracking-[0.45em] text-white/60">
-            Oriental Architecture Intelligence Lab
-          </div>
+        /* 平滑滚动与隐藏默认滚动条（自定义滚动感） */
+        html {
+            scroll-behavior: smooth;
+        }
 
-          <div className="hidden lg:flex gap-12 text-sm uppercase tracking-[0.25em] text-white/40">
-            <div className="hover:text-white transition-colors cursor-pointer">Hanzi Space</div>
-            <div className="hover:text-white transition-colors cursor-pointer">AI Review</div>
-            <div className="hover:text-white transition-colors cursor-pointer">Architecture Logic</div>
-            <div className="hover:text-white transition-colors cursor-pointer">PDF System</div>
-          </div>
+        /* 自定义滚动条微调 */
+        ::-webkit-scrollbar {
+            width: 3px;
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff3a2f;
+            border-radius: 2px;
+        }
+
+        /* canvas 全屏 Three.js 背景层 */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none; /* 让canvas不阻挡UI交互但保留视觉 */
+        }
+
+        /* 内容容器，覆盖在canvas之上 */
+        .content {
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        /* 每个section占据视口高度，用于滚动锚点 */
+        section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+            will-change: transform;
+        }
+
+        /* 自定义容器宽高限定 */
+        .screen-container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* ---------- 第一屏：中央汉字装置 ---------- */
+        .hero-chinese {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: none;
+        }
+        .hero-chinese h1 {
+            font-size: clamp(12rem, 25vw, 28rem);
+            font-weight: 800;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.02em;
+            color: #eaeaea;
+            text-shadow: 0 0 15px rgba(255, 60, 0, 0.3);
+            transition: all 0.1s cubic-bezier(0.2, 1.2, 0.3, 1);
+            transform-origin: center;
+            will-change: transform, letter-spacing;
+            position: relative;
+            z-index: 20;
+        }
+
+        /* 第二屏：汉字解构网格 */
+        .deconstruction-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3rem;
+            perspective: 1200px;
+        }
+        .char-card {
+            background: rgba(10, 10, 12, 0.65);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 80, 40, 0.3);
+            border-radius: 32px;
+            padding: 2rem 2rem;
+            width: 220px;
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            transform-style: preserve-3d;
+        }
+        .char-card:hover {
+            border-color: #ff4a2a;
+            box-shadow: 0 0 35px rgba(255, 60, 0, 0.3);
+            transform: translateY(-12px) rotateX(5deg);
+            background: rgba(20, 18, 22, 0.9);
+        }
+        .big-char {
+            font-size: 6rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            letter-spacing: 0;
+        }
+        .char-meaning {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 300;
+            color: #ff9f7a;
+        }
+        .char-description {
+            font-size: 0.75rem;
+            margin-top: 1rem;
+            color: #bbb;
+            font-weight: 300;
+        }
+
+        /* 第三屏：AI扫描模拟 */
+        .ai-scan-area {
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 70, 30, 0.6);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+        }
+        .upload-zone {
+            border: 2px dashed #ff4a2a;
+            border-radius: 32px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.2s;
+            background: rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        .upload-zone:hover {
+            background: rgba(255, 60, 30, 0.1);
+            border-color: #ff795a;
+        }
+        .preview-img {
+            max-width: 100%;
+            max-height: 400px;
+            margin: 1rem auto;
+            border-radius: 20px;
+            object-fit: contain;
+        }
+        .scan-overlay {
+            position: relative;
+        }
+        .error-mark {
+            position: absolute;
+            border: 2px solid #ff2a00;
+            background: rgba(255, 42, 0, 0.2);
+            box-shadow: 0 0 12px rgba(255, 42, 0, 0.6);
+            pointer-events: none;
+            border-radius: 4px;
+            animation: pulseRed 1.2s infinite;
+        }
+        @keyframes pulseRed {
+            0% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(255, 42, 0, 0.4);}
+            100% { opacity: 1; box-shadow: 0 0 12px 4px rgba(255, 42, 0, 0.7);}
+        }
+        /* 第四屏：拖拽重组区 */
+        .drag-lab {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+        }
+        .draggable-set {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .drag-item {
+            font-size: 5rem;
+            background: rgba(20,18,24,0.8);
+            backdrop-filter: blur(4px);
+            padding: 1rem 1.5rem;
+            border-radius: 42px;
+            border: 1px solid #ff5a3a;
+            cursor: grab;
+            transition: all 0.2s;
+            user-select: none;
+            display: inline-block;
+        }
+        .drag-item:active {
+            cursor: grabbing;
+        }
+        .assembly-zone {
+            min-height: 220px;
+            width: 100%;
+            max-width: 500px;
+            border: 2px dashed #ff7a4a;
+            border-radius: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem;
+            background: rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            font-size: 5rem;
+            font-weight: 800;
+            color: #ffaa88;
+        }
+        /* 第五屏 规范语法树 */
+        .syntax-tree {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+        .tree-node {
+            background: linear-gradient(145deg, #111, #050505);
+            border-left: 3px solid #ff4a2a;
+            padding: 1.2rem 1.8rem;
+            border-radius: 20px;
+            width: 240px;
+            transition: transform 0.3s;
+        }
+        .tree-node:hover {
+            transform: translateX(8px);
+            background: #1a181c;
+        }
+        .node-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        .node-desc {
+            font-size: 0.75rem;
+            color: #ccaa99;
+            margin-top: 0.5rem;
+        }
+
+        /* 全局文字指引光标 */
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ff4a2a;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: 0.05s linear;
+            mix-blend-mode: difference;
+        }
+
+        @media (max-width: 760px) {
+            .char-card { width: 160px; padding: 1rem; }
+            .big-char { font-size: 3rem; }
+            .drag-item { font-size: 3rem; padding: 0.5rem 1rem;}
+            .assembly-zone { font-size: 3rem;}
+            section { padding: 1rem;}
+        }
+        .btn-outline {
+            background: none;
+            border: 1px solid #ff4a2a;
+            color: #ffaa88;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+        .btn-outline:hover {
+            background: #ff4a2a22;
+            border-color: #ff8a6a;
+        }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+<div class="custom-cursor" id="cursor"></div>
+
+<div class="content">
+    <!-- 第一屏：英雄区域 巨型汉字装置 -->
+    <section id="screen1">
+        <div class="hero-chinese">
+            <h1 id="heroChar">構</h1>
         </div>
-      </header>
+    </section>
 
-      {/* HERO */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-[42vw] leading-none font-thin text-white/[0.05] tracking-[-0.12em] animate-pulse select-none">
-            構
-          </div>
+    <!-- 第二屏：汉字解构 建筑可视化 -->
+    <section id="screen2">
+        <div class="screen-container">
+            <div class="deconstruction-grid">
+                <div class="char-card" data-char="門" data-cad="门厅入口平面">
+                    <div class="big-char">門</div>
+                    <div class="char-meaning">空间入口</div>
+                    <div class="char-description">门即边界，空间叙事之始</div>
+                </div>
+                <div class="char-card" data-char="間" data-cad="光井剖面">
+                    <div class="big-char">間</div>
+                    <div class="char-meaning">光的进入</div>
+                    <div class="char-description">虚实相生，光隙叙写容积</div>
+                </div>
+                <div class="char-card" data-char="火" data-cad="消防疏散逻辑">
+                    <div class="big-char">火</div>
+                    <div class="char-meaning">消防规范</div>
+                    <div class="char-description">火焰警示，安全拓扑</div>
+                </div>
+                <div class="char-card" data-char="井" data-cad="网格系统轴线">
+                    <div class="big-char">井</div>
+                    <div class="char-meaning">城市网格</div>
+                    <div class="char-description">结构秩序，参数化基底</div>
+                </div>
+                <div class="char-card" data-char="構" data-cad="系统骨架连接">
+                    <div class="big-char">構</div>
+                    <div class="char-meaning">系统连接</div>
+                    <div class="char-description">构件耦合，建筑语法核</div>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:80px_80px] opacity-30" />
-
-        <div className="relative z-10 max-w-[1800px] mx-auto px-10 w-full grid lg:grid-cols-[1fr_0.9fr] gap-24 items-center pt-24">
-          <div>
-            <div className="mb-8 inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-2xl uppercase tracking-[0.35em] text-xs text-white/55">
-              Hanzi × Architecture × AI
-            </div>
-
-            <h1 className="text-[90px] md:text-[160px] xl:text-[230px] leading-[0.78] tracking-[-0.1em] font-extralight mb-10">
-              東方
-              <br />
-              空間
-              <br />
-              智能
-            </h1>
-
-            <div className="max-w-2xl text-white/50 text-xl leading-10 font-light mb-14">
-              将中国汉字结构、建筑空间逻辑与 AI 智能审图融合。
-              不是一个普通网站，而是一座“数字汉字建筑实验室”。
-            </div>
-
-            <div className="flex flex-wrap gap-5">
-              <button className="px-10 py-5 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-all duration-700">
-                Enter Space
-              </button>
-
-              <button className="px-10 py-5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-2xl text-lg hover:bg-white/[0.08] transition-all duration-700">
-                Upload Drawings
-              </button>
-            </div>
-          </div>
-
-          <div className="relative flex items-center justify-center">
-            <div className="absolute w-[900px] h-[900px] rounded-full border border-white/5 animate-spin [animation-duration:60s]" />
-            <div className="absolute w-[700px] h-[700px] rounded-full border border-cyan-400/10 animate-spin [animation-duration:24s] [animation-direction:reverse]" />
-
-            <div className="relative w-[720px] aspect-square rounded-[60px] overflow-hidden border border-white/10 bg-white/[0.03] backdrop-blur-3xl shadow-[0_0_120px_rgba(255,255,255,0.08)] rotate-[7deg] hover:rotate-0 transition-all duration-1000">
-              <div className="absolute inset-0">
-                <img
-                  src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=2070&auto=format&fit=crop"
-                  className="w-full h-full object-cover opacity-35 scale-105"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/90" />
-              </div>
-
-              <div className="relative z-10 h-full p-10 flex flex-col justify-between">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="uppercase tracking-[0.3em] text-xs text-white/40 mb-3">
-                      AI Spatial Review
-                    </div>
-
-                    <div className="text-5xl font-extralight leading-tight tracking-tight">
-                      Hanzi
-                      <br />
-                      Architecture
-                    </div>
-                  </div>
-
-                  <div className="w-4 h-4 rounded-full bg-emerald-400 animate-pulse" />
+    <!-- 第三屏：AI建筑扫描仪 + 审图模拟 -->
+    <section id="screen3">
+        <div class="screen-container">
+            <div class="ai-scan-area">
+                <h2 style="font-weight: 500; letter-spacing: 1px; margin-bottom: 1rem;">◈ 建筑扫描实验室 ◈</h2>
+                <div id="uploadZone" class="upload-zone">
+                    <p>⤴ 拖拽或点击上传 平面图 / PDF / 图片</p>
+                    <input type="file" id="fileInput" accept="image/jpeg,image/png,application/pdf" style="display: none;">
+                    <div id="previewContainer" style="position: relative; margin-top: 1rem;"></div>
                 </div>
-
-                <div className="space-y-5">
-                  <div className="rounded-[32px] border border-red-400/15 bg-red-500/10 backdrop-blur-xl p-7">
-                    <div className="uppercase tracking-[0.25em] text-xs text-red-300 mb-4">
-                      AI Regulation Error
-                    </div>
-
-                    <div className="text-3xl font-light mb-3">
-                      疏散距离超限
-                    </div>
-
-                    <div className="text-white/55 leading-8">
-                      自动关联《建筑设计防火规范》GB50016 第5.5.17条。
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-5">
-                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-                      <div className="text-6xl font-extralight mb-4">12</div>
-                      <div className="uppercase tracking-[0.2em] text-xs text-white/45">
-                        AI Issues
-                      </div>
-                    </div>
-
-                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-                      <div className="text-6xl font-extralight mb-4">10</div>
-                      <div className="uppercase tracking-[0.2em] text-xs text-white/45">
-                        Hanzi Levels
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <div id="scanResult" style="margin-top: 1rem; font-size: 0.8rem; color: #ffb488;"></div>
             </div>
-          </div>
         </div>
-      </section>
+    </section>
 
-      {/* HANZI STRUCTURE */}
-      <section className="relative py-44 border-y border-white/10 overflow-hidden">
-        <div className="max-w-[1800px] mx-auto px-10">
-          <div className="grid lg:grid-cols-2 gap-24 mb-28 items-end">
-            <div>
-              <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-6">
-                Hanzi Spatial Logic
-              </div>
-
-              <h2 className="text-[90px] leading-[0.88] tracking-[-0.06em] font-extralight">
-                Hanzi
-                <br />
-                Is
-                <br />
-                Architecture
-              </h2>
+    <!-- 第四屏：汉字重组生成建筑 -->
+    <section id="screen4">
+        <div class="screen-container drag-lab">
+            <p style="letter-spacing: 3px;">汉字机关 · 参数化合龙</p>
+            <div class="draggable-set">
+                <div class="drag-item" draggable="true" data-part="木">木</div>
+                <div class="drag-item" draggable="true" data-part="门">门</div>
+                <div class="drag-item" draggable="true" data-part="火">火</div>
             </div>
-
-            <div className="text-white/50 text-2xl leading-[2.2] font-light max-w-2xl">
-              汉字不仅是文字，更是东方的空间结构系统。
-              每一个偏旁、每一笔画，都对应建筑、城市与秩序。
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {hanzi.map((char, index) => (
-              <div
-                key={index}
-                className="group relative h-[520px] rounded-[50px] overflow-hidden border border-white/10 bg-white/[0.03] backdrop-blur-2xl hover:bg-white/[0.05] transition-all duration-1000"
-              >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_60%)]" />
-
-                <div className="relative z-10 h-full flex flex-col justify-between p-10">
-                  <div className="text-[180px] leading-none font-thin text-white/10 group-hover:scale-110 transition-transform duration-1000">
-                    {char}
-                  </div>
-
-                  <div>
-                    <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-5">
-                      Hanzi Mechanism
-                    </div>
-
-                    <div className="text-6xl font-extralight tracking-tight mb-6 leading-none">
-                      {char}
-                    </div>
-
-                    <div className="text-white/55 text-lg leading-9">
-                      {char === '門' && '门，是空间的入口，是建筑最初的界面。'}
-                      {char === '火' && '火，是消防规范，是安全秩序的核心逻辑。'}
-                      {char === '井' && '井，是城市网格，是秩序与结构系统。'}
-                      {char === '城' && '城，是城市边界，是空间组织体系。'}
-                      {char === '人' && '人，是建筑动线，是空间体验主体。'}
-                      {char === '構' && '構，是建筑构件，是东方结构哲学。'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+            <div id="assemblyZone" class="assembly-zone">⟡ 组合成構 ⟡</div>
+            <p style="font-size: 0.7rem; opacity: 0.6;">拖放部首至下方区域，重组「構」· 生成建筑空间</p>
+            <div id="generatedPlan" style="font-size: 0.8rem; color:#ffaa77; margin-top: 10px;"></div>
         </div>
-      </section>
+    </section>
 
-      {/* AI REVIEW */}
-      <section className="relative py-44 overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-            className="w-full h-full object-cover opacity-10"
-          />
-        </div>
-
-        <div className="relative z-10 max-w-[1800px] mx-auto px-10">
-          <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-24 items-center mb-28">
-            <div>
-              <div className="uppercase tracking-[0.3em] text-xs text-white/35 mb-6">
-                AI Building Review System
-              </div>
-
-              <h2 className="text-[90px] leading-[0.88] tracking-[-0.06em] font-extralight mb-14">
-                Upload
-                <br />
-                Analyze
-                <br />
-                Detect
-              </h2>
-
-              <div className="space-y-10">
-                {[
-                  'PDF / CAD 图纸上传',
-                  'OCR 自动文本识别',
-                  'AI 建筑逻辑检测',
-                  '规范条文自动匹配',
-                  '违规区域高亮分析',
-                ].map((item, i) => (
-                  <div key={item} className="flex gap-7 items-start">
-                    <div className="w-16 h-16 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-white/55 backdrop-blur-xl">
-                      {i + 1}
-                    </div>
-
-                    <div className="text-3xl font-extralight tracking-tight text-white/75 pt-3 leading-tight">
-                      {item}
-                    </div>
-                  </div>
-                ))}
-              </div>
+    <!-- 第五屏：规范语法树 -->
+    <section id="screen5">
+        <div class="screen-container">
+            <h3 style="text-align: center; margin-bottom: 2rem; font-weight: 400;">建筑规范 · 语法树</h3>
+            <div class="syntax-tree">
+                <div class="tree-node">
+                    <div class="node-title">疏</div>
+                    <div class="node-desc">顺畅的逻辑 · 动线密度</div>
+                </div>
+                <div class="tree-node">
+                    <div class="node-title">散</div>
+                    <div class="node-desc">分散至安全 · 出口间距</div>
+                </div>
+                <div class="tree-node">
+                    <div class="node-title">距</div>
+                    <div class="node-desc">空间变量 · 防火分区</div>
+                </div>
+                <div class="tree-node">
+                    <div class="node-title">構</div>
+                    <div class="node-desc">结构承重 · 汉字参数化</div>
+                </div>
             </div>
-
-            <div className="relative rounded-[60px] overflow-hidden border border-white/10 bg-white/[0.03] backdrop-blur-3xl shadow-[0_0_120px_rgba(255,255,255,0.06)]">
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-              <div className="relative z-10 p-10">
-                <div className="border-2 border-dashed border-white/15 rounded-[40px] p-28 text-center hover:border-cyan-400/40 transition-all duration-1000 group cursor-pointer">
-                  <div className="text-[160px] font-thin mb-10 group-hover:scale-110 transition-transform duration-700">
-                    +
-                  </div>
-
-                  <div className="text-5xl font-extralight tracking-tight mb-6">
-                    Drop PDF Drawings
-                  </div>
-
-                  <div className="text-white/50 text-xl leading-10 max-w-2xl mx-auto mb-12 font-light">
-                    支持 PDF.js 在线解析、IndexedDB 本地规范存储与 AI 实时审图。
-                  </div>
-
-                  <button className="px-12 py-6 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-transform duration-700">
-                    Select Drawings
-                  </button>
-                </div>
-              </div>
+            <div style="text-align: center; margin-top: 3rem;">
+                <p style="font-size: 0.8rem; border-top: 1px solid #ff4a2a30; padding-top: 1rem;">语法即规范 | 东方参数建筑准则</p>
             </div>
-          </div>
-
-          {/* REVIEW VISUAL */}
-          <div className="rounded-[60px] overflow-hidden border border-white/10 bg-white/[0.03] backdrop-blur-3xl">
-            <div className="grid lg:grid-cols-[1fr_380px] min-h-[820px]">
-              <div className="relative overflow-hidden flex items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-                <div className="relative w-[85%] aspect-[4/3] rounded-[36px] overflow-hidden border border-white/10">
-                  <img
-                    src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1600&auto=format&fit=crop"
-                    className="w-full h-full object-cover opacity-30"
-                  />
-
-                  <div className="absolute top-[30%] left-[32%] w-44 h-24 border-2 border-red-400 rounded-2xl animate-pulse" />
-                  <div className="absolute top-[52%] left-[54%] w-36 h-20 border-2 border-yellow-400 rounded-2xl animate-pulse" />
-                </div>
-              </div>
-
-              <div className="border-l border-white/10 p-8 bg-black/20 overflow-y-auto">
-                <div className="uppercase tracking-[0.25em] text-xs text-white/40 mb-4">
-                  AI Report
-                </div>
-
-                <div className="text-5xl font-extralight tracking-tight mb-12">
-                  审图结果
-                </div>
-
-                <div className="space-y-6">
-                  {[
-                    '疏散距离超限',
-                    '防火分区错误',
-                    '楼梯净宽不足',
-                    '编号逻辑冲突'
-                  ].map((item) => (
-                    <div
-                      key={item}
-                      className="rounded-[30px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 hover:bg-white/[0.06] transition-all duration-700"
-                    >
-                      <div className="text-2xl font-light mb-4">
-                        {item}
-                      </div>
-
-                      <div className="text-white/45 leading-8 mb-5">
-                        自动关联国家建筑规范与 AI 建筑逻辑分析。
-                      </div>
-
-                      <div className="inline-flex px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
-                        High Risk
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      </section>
+    </section>
+</div>
 
-      {/* CULTURE */}
-      <section className="relative py-44 px-10 border-t border-white/10 overflow-hidden">
-        <div className="max-w-[1600px] mx-auto text-center">
-          <div className="uppercase tracking-[0.35em] text-xs text-white/35 mb-8">
-            Oriental Spatial Philosophy
-          </div>
+<!-- 引入Three.js核心库与扩展 -->
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+        }
+    }
+</script>
 
-          <div className="text-[68px] md:text-[90px] leading-[1.18] tracking-[-0.05em] font-extralight mb-14">
-            “建筑审图如同汉字解谜——
-            <br />
-            规范是建筑的笔画准则，
-            <br />
-            合规是空间的结构之美。”
-          </div>
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import gsap from 'https://unpkg.com/gsap@3.12.5/index.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-          <button className="px-14 py-7 rounded-full bg-white text-black text-lg tracking-wide hover:scale-105 transition-transform duration-700">
-            Enter Hanzi Puzzle Space
-          </button>
-        </div>
-      </section>
-    </div>
-  )
-}
+    // ---- 初始化Three场景 营造漂浮粒子空间 ----
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    scene.fog = new THREE.FogExp2(0x000000, 0.008);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 2, 12);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+    
+    // 粒子系统代表汉字空间中漂浮的建筑粒子
+    const particleCount = 1800;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+        positions[i*3] = (Math.random() - 0.5) * 40;
+        positions[i*3+1] = (Math.random() - 0.5) * 20;
+        positions[i*3+2] = (Math.random() - 0.5) * 20 - 10;
+    }
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const particleMat = new THREE.PointsMaterial({ color: 0xff5533, size: 0.05, transparent: true, opacity: 0.4 });
+    const particles = new THREE.Points(geometry, particleMat);
+    scene.add(particles);
+    
+    // 添加淡蓝色的光晕线框 汉字轴线暗示
+    const gridHelper = new THREE.GridHelper(30, 40, 0xff4422, 0x332211);
+    gridHelper.position.y = -2;
+    gridHelper.material.transparent = true;
+    gridHelper.material.opacity = 0.18;
+    scene.add(gridHelper);
+    
+    // 悬浮光晕球体增加张力
+    const ambientLight = new THREE.AmbientLight(0x221111);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xff4422, 0.6, 25);
+    pointLight.position.set(2, 3, 4);
+    scene.add(pointLight);
+    
+    let time = 0;
+    function animateScene() {
+        requestAnimationFrame(animateScene);
+        time += 0.005;
+        particles.rotation.y = Math.sin(time * 0.1) * 0.1;
+        particles.rotation.x = Math.sin(time * 0.07) * 0.05;
+        camera.lookAt(0, 0.5, 0);
+        renderer.render(scene, camera);
+    }
+    animateScene();
+    
+    // 窗口尺寸适配
+    window.addEventListener('resize', onWindowResize, false);
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
+    // ---------- 第一屏鼠标交互：汉字变形 GSAP 和 CSS Transform ----------
+    const heroH1 = document.getElementById('heroChar');
+    document.addEventListener('mousemove', (e) => {
+        const winW = window.innerWidth, winH = window.innerHeight;
+        const centerX = winW / 2, centerY = winH / 2;
+        let deltaX = (e.clientX - centerX) / centerX;  // -1..1
+        let deltaY = (e.clientY - centerY) / centerY;
+        deltaX = Math.min(Math.max(deltaX, -1), 1);
+        deltaY = Math.min(Math.max(deltaY, -1), 1);
+        const intensity = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+        const skewX = deltaX * 18;
+        const scaleX = 1 + Math.abs(deltaX) * 0.35;
+        const letterSpacing = deltaX * 12;
+        const colorVal = 200 + Math.floor(Math.abs(deltaX) * 55);
+        gsap.to(heroH1, {
+            duration: 0.4,
+            ease: "power2.out",
+            skewX: skewX,
+            scaleX: scaleX,
+            letterSpacing: `${letterSpacing}px`,
+            color: `rgb(255, ${80 + Math.abs(deltaX)*70}, ${40 + Math.abs(deltaX)*30})`,
+            textShadow: `0 0 ${15 + Math.abs(deltaX)*18}px rgba(255,80,0,0.8)`,
+        });
+    });
+    
+    // 第二屏悬停3D效果模拟CAD浮现：通过添加临时浮动层和GSAP动画
+    const cards = document.querySelectorAll('.char-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            const cadHint = card.getAttribute('data-cad');
+            const bigCharSpan = card.querySelector('.big-char');
+            gsap.to(card, { duration: 0.25, borderColor: '#ff7a4a', boxShadow: '0 0 35px rgba(255,80,0,0.6)' });
+            // 模拟建筑线框浮现 (在卡片内增加临时视觉)
+            let overlayDiv = card.querySelector('.cad-overlay');
+            if(!overlayDiv){
+                overlayDiv = document.createElement('div');
+                overlayDiv.className = 'cad-overlay';
+                overlayDiv.style.position = 'absolute';
+                overlayDiv.style.bottom = '10px';
+                overlayDiv.style.left = '10px';
+                overlayDiv.style.fontSize = '10px';
+                overlayDiv.style.backgroundColor = '#ff3a2a30';
+                overlayDiv.style.padding = '4px 8px';
+                overlayDiv.style.borderRadius = '20px';
+                overlayDiv.style.backdropFilter = 'blur(4px)';
+                overlayDiv.innerText = cadHint;
+                card.style.position = 'relative';
+                card.appendChild(overlayDiv);
+            } else overlayDiv.innerText = cadHint;
+        });
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card, { duration: 0.3, borderColor: 'rgba(255,80,40,0.3)', boxShadow: 'none' });
+            const overlay = card.querySelector('.cad-overlay');
+            if(overlay) overlay.remove();
+        });
+    });
+    
+    // ---------- 第三屏 AI 模拟审图 (模拟检测错误) ----------
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const scanResultDiv = document.getElementById('scanResult');
+    
+    uploadZone.addEventListener('click', () => fileInput.click());
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.style.background = '#ff4a2a20'; });
+    uploadZone.addEventListener('dragleave', () => uploadZone.style.background = 'rgba(0,0,0,0.4)');
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.style.background = 'rgba(0,0,0,0.4)';
+        const file = e.dataTransfer.files[0];
+        if(file) processFile(file);
+    });
+    fileInput.addEventListener('change', (e) => {
+        if(fileInput.files.length) processFile(fileInput.files[0]);
+    });
+    
+    function processFile(file) {
+        if(!file.type.startsWith('image/')) {
+            scanResultDiv.innerText = '⚠️ 演示模式: 仅支持图像预览，模拟扫描中... 发现风险: 防火墙不连续 | 疏散距离超标';
+            previewContainer.innerHTML = '<div style="padding:1rem;border:1px solid #ff3a2a;border-radius:20px;">📄 PDF 模拟审图: 识别到2处规范冲突( 红色标注 )</div>';
+            addMockErrors();
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.className = 'preview-img';
+            previewContainer.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'relative';
+            wrapper.appendChild(img);
+            previewContainer.appendChild(wrapper);
+            // 模拟两个错误标注框
+            setTimeout(() => {
+                addMockErrorsOnImg(wrapper);
+                scanResultDiv.innerText = '✓ 扫描完成 | 发现2处不符合: ① 疏散门间距不足 ② 防火分区超限 (红色标记区域)';
+            }, 800);
+        };
+        reader.readAsDataURL(file);
+    }
+    function addMockErrorsOnImg(parent) {
+        const mark1 = document.createElement('div');
+        mark1.className = 'error-mark';
+        mark1.style.top = '25%';
+        mark1.style.left = '15%';
+        mark1.style.width = '28%';
+        mark1.style.height = '18%';
+        const mark2 = document.createElement('div');
+        mark2.className = 'error-mark';
+        mark2.style.bottom = '30%';
+        mark2.style.right = '12%';
+        mark2.style.width = '35%';
+        mark2.style.height = '15%';
+        parent.style.position = 'relative';
+        parent.appendChild(mark1);
+        parent.appendChild(mark2);
+        setTimeout(() => { mark1.remove(); mark2.remove(); }, 4000);
+    }
+    function addMockErrors() { scanResultDiv.innerHTML += '<span style="display:block;margin-top:8px;">🔴 红色动态描边: 疏散路径错误 / 防火墙未闭合</span>'; }
+    
+    // 第四屏 拖拽重组 模拟组合“構”
+    const dragItems = document.querySelectorAll('.drag-item');
+    const assemblyZoneDiv = document.getElementById('assemblyZone');
+    let combinedParts = [];
+    dragItems.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', item.getAttribute('data-part'));
+            e.dataTransfer.effectAllowed = 'copy';
+        });
+    });
+    assemblyZoneDiv.addEventListener('dragover', (e) => e.preventDefault());
+    assemblyZoneDiv.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const part = e.dataTransfer.getData('text/plain');
+        if(part && !combinedParts.includes(part)){
+            combinedParts.push(part);
+            if(combinedParts.length === 3) {
+                assemblyZoneDiv.innerHTML = '構';
+                assemblyZoneDiv.style.fontSize = '6rem';
+                assemblyZoneDiv.style.color = '#ff8866';
+                document.getElementById('generatedPlan').innerHTML = '🏛️ 参数建筑空间生成: 木+门+火 = 「構」 结构骨架 · 东方参数化平面已激活';
+                gsap.to(assemblyZoneDiv, { scale: 1.1, duration: 0.3, yoyo: true, repeat: 1 });
+            } else {
+                assemblyZoneDiv.innerHTML = combinedParts.join(' + ');
+            }
+        }
+    });
+    
+    // 全局自定义光标跟移
+    const cursorDiv = document.getElementById('cursor');
+    document.addEventListener('mousemove', (e) => {
+        gsap.to(cursorDiv, { duration: 0.08, x: e.clientX - 10, y: e.clientY - 10 });
+    });
+    document.addEventListener('mouseenter', () => cursorDiv.style.opacity = 1);
+    document.addEventListener('mouseleave', () => cursorDiv.style.opacity = 0);
+    
+    // 平滑滚动 GSAP 触发相机视角微动，创建空间感
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const progress = scrollY / maxScroll;
+        // 基于滚动轻微移动相机视点产生景深感
+        gsap.to(camera.position, { duration: 0.8, z: 12 - progress * 1.5, y: 2 + progress * 0.6, ease: "power1.out" });
+        // 粒子略微浮动
+        particles.rotation.z = progress * 0.5;
+    });
+    
+    // 首屏进入后动画强化
+    gsap.fromTo(heroH1, { opacity: 0, filter: "blur(12px)" }, { opacity: 1, filter: "blur(0px)", duration: 1.5, delay: 0.2 });
+    
+    // 额外给各个屏幕的滚动进入动效
+    const sections = document.querySelectorAll('section');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting){
+                gsap.fromTo(entry.target.children, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1 });
+            }
+        });
+    }, { threshold: 0.2 });
+    sections.forEach(sec => observer.observe(sec));
+    
+    // 增加微小悬浮粒子光晕 (点缀)
+    console.log('东方汉字空间实验室已启动 · 建筑与字符共生');
+</script>
+</body>
+</html>
