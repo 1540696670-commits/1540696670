@@ -1,145 +1,595 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text3D, Center, OrbitControls, Environment } from '@react-three/drei';
-import { gsap } from 'gsap';
-import * as THREE from 'three';
-import { pdfjs } from 'react-pdf';
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>审图网站</title>
+<style>
+  :root {
+    --bg:#08080d; --surface:rgba(255,255,255,0.025); --surface-hover:rgba(255,255,255,0.05);
+    --border:rgba(255,255,255,0.07); --border-active:rgba(255,255,255,0.14);
+    --text:rgba(255,255,255,0.82); --text-dim:rgba(255,255,255,0.45); --text-bright:rgba(255,255,255,0.93);
+    --accent:#c9a95c; --accent-dim:rgba(201,169,92,0.15); --accent-glow:rgba(201,169,92,0.35);
+    --danger:#d9705a; --danger-dim:rgba(217,112,90,0.15); --success:#7eb896; --info:#6ba3c7;
+    --radius:6px; --radius-lg:10px;
+    --font-heading:"Playfair Display","STSong","Songti SC","Noto Serif SC",serif;
+    --font-body:"Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
+  .app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-// 初始化PDF解析
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+  /* Header */
+  .header{flex-shrink:0;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .header h1{font-family:var(--font-heading);font-size:1.4rem;font-weight:700;color:var(--text-bright);letter-spacing:0.06em}
+  .header .sub{font-size:0.72rem;color:var(--text-dim);letter-spacing:0.12em;text-transform:uppercase}
 
-// 核心3D汉字组件
-const ChineseCharacter3D = ({ char, position }) => {
-  const meshRef = useRef();
-  const [hovered, setHovered] = useState(false);
+  /* Layout */
+  .main{flex:1;display:flex;overflow:hidden}
+  .panel-left{width:38%;min-width:340px;max-width:480px;border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
+  .panel-right{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#05050a}
+  @media(max-width:900px){
+    .main{flex-direction:column}
+    .panel-left{width:100%;min-width:0;max-width:none;border-right:none;border-bottom:1px solid var(--border);max-height:42vh}
+    .panel-right{max-height:58vh}
+    .header{padding:10px 14px}.header h1{font-size:1.2rem}
+  }
 
-  // 汉字3D动效：旋转、悬浮、坍塌
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.005;
-      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime) * 0.2;
-    }
-  });
+  /* Sections */
+  .section{padding:16px 20px;border-bottom:1px solid var(--border)}
+  .sec-title{font-family:var(--font-heading);font-size:0.88rem;font-weight:600;color:var(--text-bright);margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:0.03em}
+  .sec-title .ic{color:var(--accent)}
 
-  // 点击触发汉字机关/跳转
-  const handleClick = () => {
-    gsap.to(meshRef.current.position, { y: -10, duration: 0.8, ease: "power2.out" });
-    setTimeout(() => setActivePage('game'), 800);
-  };
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 15px;border-radius:var(--radius);font-size:0.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);letter-spacing:0.02em;transition:all 0.2s;white-space:nowrap}
+  .btn:hover{border-color:var(--border-active);background:var(--surface-hover)}
+  .btn-primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
+  .btn-primary:hover{background:#d4b56a;border-color:#d4b56a;box-shadow:0 0 20px var(--accent-glow)}
+  .btn-primary:disabled{opacity:0.35;cursor:not-allowed;box-shadow:none}
+  .btn-sm{padding:5px 10px;font-size:0.72rem}
+  .btn-danger{border-color:var(--danger);color:var(--danger)}.btn-danger:hover{background:var(--danger-dim)}
+  .btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 
-  return (
-    <mesh
-      ref={meshRef}
-      position={position}
-      onClick={handleClick}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    >
-      <Text3D
-        font="/fonts/helvetiker_regular.typeface.json"
-        size={hovered ? 2.2 : 2}
-        height={0.3}
-        curveSegments={12}
-      >
-        {char}
-        <meshStandardMaterial color={hovered ? "#ffffff" : "#cccccc"} metalness={0.8} roughness={0.2} />
-      </Text3D>
-    </mesh>
-  );
-};
+  /* Upload zone */
+  .up-zone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:22px 14px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface);position:relative}
+  .up-zone:hover,.up-zone.drag{border-color:var(--accent);background:var(--accent-dim)}
+  .up-zone.done{border-color:var(--success);border-style:solid;background:rgba(126,184,150,0.05)}
+  .up-zone .up-ic{font-size:1.5rem;margin-bottom:4px;opacity:0.5}
+  .up-zone .up-txt{font-size:0.8rem;color:var(--text-dim)}
+  .up-zone .up-hint{font-size:0.68rem;color:var(--text-dim);opacity:0.5;margin-top:2px}
+  .up-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 
-// 汉字机关游戏（抖音同款）
-const CharacterGame = ({ onClose }) => {
-  const [level, setLevel] = useState(1);
-  const levels = [
-    { q: "日 + 一笔 = ?", a: ["目", "田", "甲"] },
-    { q: "氵+ 可 = ?", a: "河" },
-    { q: "人人人 = ?", a: "众" },
-    { q: "站着1 躺着2 趴着3", a: "三" },
-    { q: "人人都念错的字", a: "错" },
-  ];
+  /* Reg file list */
+  .rf-item{display:flex;align-items:center;gap:6px;padding:7px 10px;margin-top:5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:0.78rem}
+  .rf-item .fn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+  .rf-item .fi{font-size:0.7rem;color:var(--text-dim);flex-shrink:0}
 
-  return (
-    <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 text-white">
-      <div className="w-full max-w-2xl p-8 text-center">
-        <h2 className="text-4xl mb-8 font-light tracking-widest">汉字机关 · 第{level}关</h2>
-        <p className="text-2xl mb-10 tracking-wide">{levels[level-1].q}</p>
-        <input className="bg-transparent border-b-2 border-white text-2xl p-3 text-center w-full outline-none" placeholder="输入答案" />
-        <div className="mt-10 flex gap-4 justify-center">
-          <button onClick={() => setLevel(level+1)} className="px-8 py-3 border border-white hover:bg-white hover:text-black transition">下一关</button>
-          <button onClick={onClose} className="px-8 py-3 border border-white hover:bg-white hover:text-black transition">返回空间</button>
+  /* PDF Viewer */
+  .pdf-viewer{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px}
+  .pdf-pwrap{position:relative;margin:0 auto 12px;box-shadow:0 3px 16px rgba(0,0,0,0.45);background:#fff;line-height:0}
+  .pdf-pwrap canvas{display:block;width:100%;height:auto}
+  .pdf-pwrap .hl-layer{position:absolute;inset:0;pointer-events:none}
+  .pdf-pwrap .hl-rect{position:absolute;background:rgba(217,112,90,0.3);border:2px solid rgba(255,120,80,0.75);border-radius:2px;animation:hlPulse 1.2s ease-in-out infinite}
+  @keyframes hlPulse{0%,100%{background:rgba(217,112,90,0.25)}50%{background:rgba(255,130,90,0.5)}}
+
+  /* Results bar */
+  .res-bar{border-top:1px solid var(--border);background:var(--bg);max-height:44%;overflow-y:auto;flex-shrink:0}
+  .res-hd{padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:2}
+  .res-hd .tab{padding:5px 12px;border-radius:100px;font-size:0.76rem;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);transition:all 0.15s;white-space:nowrap}
+  .res-hd .tab.active,.res-hd .tab:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+  .res-hd .tab .badge{padding:1px 6px;border-radius:100px;font-size:0.66rem;margin-left:3px;background:var(--danger-dim);color:var(--danger)}
+  .res-list{padding:8px 14px}
+
+  /* Issue cards */
+  .iss{cursor:pointer;padding:9px 11px;margin-bottom:5px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:var(--radius);transition:all 0.15s;font-size:0.8rem}
+  .iss:hover,.iss.act{border-color:var(--danger);background:var(--danger-dim);box-shadow:0 0 10px rgba(217,112,90,0.1)}
+  .iss .is{font-weight:600;color:var(--text-bright);margin-bottom:2px}
+  .iss .im{font-size:0.72rem;color:var(--text-dim)}
+  .iss .ikw{display:inline-block;background:var(--danger-dim);color:var(--danger);padding:1px 5px;border-radius:3px;font-size:0.68rem;margin:0 1px}
+  .iss .ip{font-size:0.7rem;color:var(--info);margin-top:2px}
+
+  /* Typo items */
+  .tyi{cursor:pointer;padding:7px 9px;margin-bottom:3px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);transition:all 0.15s;font-size:0.78rem;display:flex;align-items:center;gap:8px}
+  .tyi:hover,.tyi.act{border-color:var(--accent);background:var(--accent-dim)}
+  .tyi .tw{color:var(--danger);text-decoration:line-through;min-width:50px;font-size:0.8rem}
+  .tyi .ta{color:var(--text-dim)}
+  .tyi .tc{color:var(--success);font-weight:600;font-size:0.8rem}
+  .tyi .tp{flex:1;text-align:right;font-size:0.68rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* Summary */
+  .sum-row{display:flex;gap:6px;flex-wrap:wrap;padding:6px 14px}
+  .chip{padding:5px 12px;border-radius:100px;font-size:0.74rem;border:1px solid var(--border);background:var(--surface)}
+  .chip.warn{border-color:var(--danger);background:var(--danger-dim);color:var(--danger)}
+  .chip.ok{border-color:var(--success);background:rgba(126,184,150,0.1);color:var(--success)}
+  .chip.info{border-color:var(--info);background:rgba(107,163,199,0.1);color:var(--info)}
+
+  /* Toast */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a24;border:1px solid var(--border-active);padding:10px 22px;border-radius:100px;font-size:0.8rem;color:var(--text);z-index:200;box-shadow:0 8px 30px rgba(0,0,0,0.4);animation:tIn 0.25s ease,tOut 0.25s ease 2s forwards}
+  @keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  @keyframes tOut{from{opacity:1}to{opacity:0}}
+
+  /* Misc */
+  ::-webkit-scrollbar{width:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:10px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.12)}
+  .hidden{display:none!important}
+  .empty{text-align:center;padding:40px 20px;color:var(--text-dim)}
+  .empty .big{font-size:2.5rem;opacity:0.15;margin-bottom:8px}
+  details summary{font-size:0.73rem;color:var(--accent);cursor:pointer;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div><h1>审图网站</h1><div class="sub">Drawing Review System</div></div>
+    <button class="btn btn-sm btn-danger" onclick="resetAll()">重置全部数据</button>
+  </header>
+
+  <div class="main">
+    <!-- ===== LEFT PANEL ===== -->
+    <div class="panel-left">
+      <!-- 规范库 -->
+      <div class="section">
+        <div class="sec-title"><span class="ic">&#128214;</span>规范库 · 上传本地规范PDF文件夹</div>
+        <div class="up-zone" id="regZone">
+          <div class="up-ic">&#128193;</div>
+          <div class="up-txt">点击选择包含规范 PDF 的文件夹</div>
+          <div class="up-hint">自动提取文字并生成审查关键词</div>
+          <input type="file" id="regInput" webkitdirectory multiple accept=".pdf" onchange="onRegFolder(event)">
         </div>
+        <div id="regList" style="margin-top:6px;"></div>
+        <div class="text-dim" id="regSum" style="margin-top:4px;display:none;"></div>
+        <div class="btn-row">
+          <button class="btn btn-sm btn-primary" id="btnKW" disabled onclick="extractKW()">提取关键词</button>
+          <button class="btn btn-sm btn-danger" id="btnClearReg" disabled onclick="clearRegs()">清空规范库</button>
+        </div>
+        <div id="kwBox" style="margin-top:8px;display:none;"></div>
+      </div>
+
+      <!-- 图纸上传 -->
+      <div class="section">
+        <div class="sec-title"><span class="ic">&#128196;</span>上传图纸 PDF</div>
+        <div class="up-zone" id="drawZone">
+          <div class="up-ic">&#128206;</div>
+          <div class="up-txt" id="drawTxt">拖拽或点击上传图纸 PDF</div>
+          <div class="up-hint">.pdf 格式</div>
+          <input type="file" id="drawInput" accept=".pdf">
+        </div>
+        <div class="text-dim" id="drawInfo" style="margin-top:6px;display:none;"></div>
+        <button class="btn btn-primary" id="btnCheck" disabled onclick="runCheck()" style="width:100%;margin-top:12px;justify-content:center;padding:11px;">
+          &#128269; 开始核对
+        </button>
+      </div>
+
+      <!-- 错别字说明 -->
+      <div class="section">
+        <div class="sec-title"><span class="ic">&#9998;</span>错别字自动检测</div>
+        <div class="text-dim">已内置 36 个建筑行业常见错别字词条，核对时自动扫描。</div>
+        <details><summary>展开查看词库</summary>
+          <div id="typoDict" style="font-size:0.72rem;color:var(--text-dim);line-height:1.7;margin-top:4px;"></div>
+        </details>
       </div>
     </div>
-  );
-};
 
-// 建筑AI审图实验室
-const BlueprintLab = () => {
-  const [pdfFile, setPdfFile] = useState(null);
-  
-  const handleUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) setPdfFile(URL.createObjectURL(file));
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/95 z-40 text-white p-10">
-      <h2 className="text-4xl font-light tracking-widest mb-10">AI建筑扫描实验室</h2>
-      <div className="border-2 border-dashed border-white/30 p-10 text-center">
-        <input type="file" accept="application/pdf" onChange={handleUpload} className="mb-6" />
-        <p className="text-xl">上传建筑PDF图纸 → 自动检测规范违规 → 定位错误</p>
-        {pdfFile && <div className="mt-6 p-4 bg-white/10">已加载：图纸解析中... 违规项已标注</div>}
-        <button className="mt-8 px-8 py-3 border border-white hover:bg-white hover:text-black">开始智能审图</button>
+    <!-- ===== RIGHT PANEL ===== -->
+    <div class="panel-right">
+      <div class="pdf-viewer" id="pdfViewer">
+        <div class="empty" id="pdfEmpty">
+          <div class="big">&#128196;</div><div>图纸 PDF 预览区</div>
+          <div style="font-size:0.72rem;opacity:0.5;">上传图纸后在此预览，结果可点击跳转定位</div>
+        </div>
+        <div id="pdfPages"></div>
+      </div>
+      <div class="res-bar hidden" id="resBar">
+        <div class="res-hd">
+          <span style="font-weight:600;font-size:0.82rem;color:var(--text-bright);">核对结果</span>
+          <button class="tab active" id="tabIss" onclick="switchTab('issues')">不合理项<span class="badge" id="badgeIss">0</span></button>
+          <button class="tab" id="tabTyp" onclick="switchTab('typos')">文本错误<span class="badge" id="badgeTyp">0</span></button>
+          <div style="flex:1;"></div>
+          <button class="btn btn-sm" onclick="toggleResBar()" id="btnToggleRes">折叠 &#9650;</button>
+        </div>
+        <div class="sum-row" id="sumRow"></div>
+        <div class="res-list" id="resList"></div>
       </div>
     </div>
-  );
-};
+  </div>
+</div>
 
-// 主应用
-const App = () => {
-  const [activePage, setActivePage] = useState('home');
-  const containerRef = useRef();
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+/* ===================================================================
+   1. INIT & GLOBALS
+   =================================================================== */
+if(typeof pdfjsLib!=='undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-  return (
-    <div ref={containerRef} className="w-screen h-screen bg-black overflow-hidden relative font-sans">
-      {/* 左侧空间导航 */}
-      <div className="fixed left-8 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-8 text-white text-lg tracking-widest">
-        <button onClick={() => setActivePage('home')} className="hover:text-gray-400 transition">汉字空间</button>
-        <button onClick={() => setActivePage('game')} className="hover:text-gray-400 transition">汉字机关</button>
-        <button onClick={() => setActivePage('lab')} className="hover:text-gray-400 transition">审图实验室</button>
-        <button onClick={() => setActivePage('blueprint')} className="hover:text-gray-400 transition">Blueprint空间</button>
-        <button onClick={() => setActivePage('tree')} className="hover:text-gray-400 transition">建筑语法树</button>
-      </div>
+const BUILTIN_TYPOS = [
+  ['混泥土','混凝土'],['刚筋','钢筋'],['防活等级','防火等级'],['砂桨','砂浆'],['沉将','沉降'],
+  ['承裁力','承载力'],['伐板','筏板'],['密实渡','密实度'],['含水绿','含水率'],['剪立墙','剪力墙'],
+  ['钢筋拢','钢筋笼'],['防水卷才','防水卷材'],['防离层','防裂层'],['保温版','保温板'],['变型缝','变形缝'],
+  ['伸缩锋','伸缩缝'],['止水袋','止水带'],['铆筋','锚筋'],['毛杆','锚杆'],['桩基储','桩基础'],
+  ['垫曾','垫层'],['保护层厚渡','保护层厚度'],['抗正等级','抗震等级'],['设房烈度','设防烈度'],
+  ['防伙分区','防火分区'],['消房车道','消防车道'],['疏敞宽度','疏散宽度'],['地基再载力','地基承载力'],
+  ['模版支撑','模板支撑'],['气蜜性','气密性'],['遮荫系数','遮阳系数'],['结构归则性','结构规则性'],
+  ['惦面','垫层'],['图约','图纸'],['打桩机储','打桩基础'],['储仓','储藏']
+];
 
-      {/* 3D汉字主场景 */}
-      {activePage === 'home' && (
-        <Canvas gl={{ antialias: true, alpha: true }} camera={{ position: [0, 0, 15] }}>
-          <Environment preset="city" />
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={1} />
-          <Center>
-            <ChineseCharacter3D char="建" position={[-4, 0, 0]} />
-            <ChineseCharacter3D char="筑" position={[-1.5, 0, 0]} />
-            <ChineseCharacter3D char="汉" position={[1.5, 0, 0]} />
-            <ChineseCharacter3D char="字" position={[4, 0, 0]} />
-          </Center>
-          <OrbitControls enableDamping autoRotate />
-        </Canvas>
-      )}
+const SK = {REGF:'reg_files_v3',REGKW:'reg_keywords_v3'};
+let regFiles=[]; try{regFiles=JSON.parse(localStorage.getItem(SK.REGF)||'[]')||[];}catch(e){}
+let regKeywords=[]; try{regKeywords=JSON.parse(localStorage.getItem(SK.REGKW)||'[]')||[];}catch(e){}
+let drawPages=[];       // {pageNum,text,items,viewport}[]
+let drawFileName='';
+let drawPDF=null;       // pdfjsLib document ref
+let checkIssues=[];     // results
+let checkTypos=[];
+let checkUnits=[];
+let activeTab='issues';
+let currentHlPage=-1;
 
-      {/* 汉字机关游戏 */}
-      {activePage === 'game' && <CharacterGame onClose={() => setActivePage('home')} />}
+/* ===================================================================
+   2. UTILS
+   =================================================================== */
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function toast(m){const e=document.querySelector('.toast');if(e)e.remove();const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2400);}
+function $(id){return document.getElementById(id);}
+function saveRegs(){try{localStorage.setItem(SK.REGF,JSON.stringify(regFiles))}catch(e){toast('存储空间不足')}}
+function saveKW(){try{localStorage.setItem(SK.REGKW,JSON.stringify(regKeywords))}catch(e){toast('存储空间不足')}}
 
-      {/* 建筑审图实验室 */}
-      {activePage === 'lab' && <BlueprintLab />}
+/* ===================================================================
+   3. TYPO DICT DISPLAY
+   =================================================================== */
+(function(){
+  $('typoDict').innerHTML=BUILTIN_TYPOS.map(t=>
+    `<span style="color:var(--danger);text-decoration:line-through">${esc(t[0])}</span> → <span style="color:var(--success)">${esc(t[1])}</span>`
+  ).join(' &nbsp;|&nbsp; ');
+})();
 
-      {/* 标题文字 */}
-      <div className="fixed top-10 left-1/2 -translate-x-1/2 text-white text-5xl text-center z-20 tracking-widest font-light">
-        动态汉字空间装置
-      </div>
+/* ===================================================================
+   4. REGULATION FOLDER
+   =================================================================== */
+async function onRegFolder(e){
+  const files=Array.from(e.target.files).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
+  if(!files.length){toast('未找到PDF文件');return}
+  $('regZone').querySelector('.up-txt').textContent='正在解析 '+files.length+' 个规范文件...';
+  const added=[];
+  for(const f of files){
+    try{
+      const buf=await f.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+      let txt='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const c=await pg.getTextContent();txt+=c.items.map(it=>it.str).join('')+'\n';}
+      added.push({name:f.name,text:txt,pageCount:pdf.numPages});
+    }catch(err){console.warn(f.name,err)}
+  }
+  if(!added.length){toast('解析失败');return}
+  regFiles=[...regFiles,...added];
+  const seen=new Set();regFiles=regFiles.filter(f=>{if(seen.has(f.name))return false;seen.add(f.name);return true;});
+  saveRegs();renderRegUI();e.target.value='';
+  $('regZone').classList.add('done');$('regZone').querySelector('.up-txt').textContent='已加载 '+regFiles.length+' 个规范（可重新选择）';
+  toast('已加载 '+added.length+' 个规范文件');
+}
+
+function renderRegUI(){
+  const list=$('regList'),sum=$('regSum'),zone=$('regZone');
+  if(!regFiles.length){
+    list.innerHTML='';sum.style.display='none';$('btnKW').disabled=true;$('btnClearReg').disabled=true;
+    zone.classList.remove('done');zone.querySelector('.up-txt').textContent='点击选择包含规范 PDF 的文件夹';
+    return;
+  }
+  list.innerHTML=regFiles.map(f=>`<div class="rf-item"><span style="color:var(--accent)">&#128214;</span><span class="fn">${esc(f.name)}</span><span class="fi">${f.pageCount}页 · ${f.text.length}字</span></div>`).join('');
+  sum.style.display='block';
+  sum.innerHTML='共 <strong>'+regFiles.length+'</strong> 个规范文件'+(regKeywords.length?' · 已提取 <strong>'+regKeywords.length+'</strong> 个关键词':' · 尚未提取关键词');
+  zone.classList.add('done');zone.querySelector('.up-txt').textContent='已加载 '+regFiles.length+' 个规范（可重新选择）';
+  $('btnKW').disabled=false;$('btnClearReg').disabled=false;updateCheckBtn();
+}
+
+function clearRegs(){
+  if(!confirm('确定清空所有规范文件和关键词吗？'))return;
+  regFiles=[];regKeywords=[];saveRegs();saveKW();renderRegUI();
+  $('kwBox').style.display='none';$('kwBox').innerHTML='';updateCheckBtn();toast('规范库已清空');
+}
+
+/* ===================================================================
+   5. KEYWORD EXTRACTION
+   =================================================================== */
+function extractKW(){
+  if(!regFiles.length){toast('请先上传规范文件');return}
+  const allText=regFiles.map(f=>f.text).join('\n');
+  const sentences=allText.split(/[。！？；\n]+/).filter(s=>s.length>5);
+  const normative=/[应必须不得禁止]/;
+  const normSent=sentences.filter(s=>normative.test(s)&&s.length<200);
+
+  const freq={};
+  for(const sent of normSent){
+    const clean=sent.replace(/[，、：；（）\(\)\[\]【】""''\s\d\.\,\;\:\-]+/g,'');
+    for(let len=3;len<=7;len++){
+      for(let i=0;i<=clean.length-len;i++){
+        const g=clean.slice(i,i+len);
+        if(/^[一-鿿]+$/.test(g)) freq[g]=(freq[g]||0)+1;
+      }
+    }
+  }
+  const stop=new Set(['应符合下列','应符合国家','应符合本','应符合现行','必须符合','不得小于','不应小于','不宜小于','应大于','必须大于','不得大于','不宜大于','且不应','且不得','且必须','同时应','并且应','以及应','或者应','建筑工程的','建筑工程','应符合','应按照','应严格','应遵照','应执行','的规定','规定执行','规定进行','国家现行','现行国家','现行标准','国家标准','规范规定','本规范','本规定','本标准','下列规定','下列标准','应当符合','应当遵守','应当执行','应当满足','必须满足','必须遵守','按下列','按以下','按照下列','按照以下','以下规定','以上规定','的要求','求进行','进行设计','设计时应','设计必须','设计中应','在设计中','在施工中','施工时应','使用时','采用时','设置时','布置时']);
+  const filtered=Object.entries(freq).filter(([g,f])=>f>=2&&!stop.has(g)).sort((a,b)=>b[1]-a[1]);
+  regKeywords=filtered.slice(0,200).map(([g])=>g);saveKW();
+
+  const box=$('kwBox');box.style.display='block';
+  box.innerHTML=`<div class="sec-title" style="font-size:0.78rem;">提取关键词（${regKeywords.length}个）</div>
+    <div style="display:flex;flex-wrap:wrap;gap:3px;max-height:120px;overflow-y:auto;">${regKeywords.slice(0,100).map(k=>`<span style="font-size:0.68rem;padding:2px 6px;border-radius:3px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(201,169,92,0.2);">${esc(k)}</span>`).join('')}${regKeywords.length>100?`<span style="font-size:0.68rem;color:var(--text-dim);padding:2px 6px;">...共${regKeywords.length}个</span>`:''}</div>`;
+  renderRegUI();toast('已提取 '+regKeywords.length+' 个关键词');
+}
+
+/* ===================================================================
+   6. DRAWING PDF
+   =================================================================== */
+const drawZone=$('drawZone');
+drawZone.addEventListener('dragover',e=>{e.preventDefault();drawZone.classList.add('drag')});
+drawZone.addEventListener('dragleave',()=>drawZone.classList.remove('drag'));
+drawZone.addEventListener('drop',e=>{e.preventDefault();drawZone.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')loadDrawing(f);else toast('请上传PDF文件')});
+$('drawInput').addEventListener('change',e=>{if(e.target.files[0])loadDrawing(e.target.files[0])});
+
+async function loadDrawing(file){
+  drawFileName=file.name;drawPages=[];drawPDF=null;
+  $('drawTxt').textContent='正在解析图纸...';drawZone.classList.add('done');
+  try{
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;drawPDF=pdf;
+    for(let i=1;i<=pdf.numPages;i++){
+      const pg=await pdf.getPage(i);const c=await pg.getTextContent();
+      drawPages.push({pageNum:i,text:c.items.map(it=>it.str).join(''),items:c.items,viewport:pg.getViewport({scale:1})});
+    }
+    $('drawInfo').style.display='block';
+    $('drawInfo').innerHTML='已加载：<strong>'+esc(file.name)+'</strong> · '+pdf.numPages+'页 · 约'+drawPages.reduce((s,p)=>s+p.text.length,0)+'字符';
+    $('drawTxt').textContent='图纸已就绪';updateCheckBtn();
+    await renderPDF();toast('图纸解析完成，共'+pdf.numPages+'页');
+  }catch(e){$('drawTxt').textContent='解析失败，请重试';drawZone.classList.remove('done');toast('解析失败：'+e.message)}
+}
+
+function updateCheckBtn(){$('btnCheck').disabled=!(drawPages.length&&regKeywords.length);}
+
+/* ===================================================================
+   7. RENDER PDF PAGES
+   =================================================================== */
+async function renderPDF(){
+  const viewer=$('pdfViewer'),empty=$('pdfEmpty'),pages=$('pdfPages');
+  if(!drawPDF||!drawPages.length){empty.classList.remove('hidden');pages.innerHTML='';return}
+  empty.classList.add('hidden');pages.innerHTML='';
+  const cw=Math.max(viewer.clientWidth-32,300);
+
+  for(const dp of drawPages){
+    const scale=cw/dp.viewport.width,w=Math.floor(dp.viewport.width*scale),h=Math.floor(dp.viewport.height*scale);
+    const wrap=document.createElement('div');wrap.className='pdf-pwrap';wrap.id='pw'+dp.pageNum;
+    wrap.style.width=w+'px';wrap.style.height=h+'px';
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.style.width=w+'px';cv.style.height=h+'px';cv.id='pc'+dp.pageNum;wrap.appendChild(cv);
+    const hl=document.createElement('div');hl.className='hl-layer';hl.id='hl'+dp.pageNum;wrap.appendChild(hl);
+    pages.appendChild(wrap);
+
+    const pg=await drawPDF.getPage(dp.pageNum);
+    await pg.render({canvasContext:cv.getContext('2d'),viewport:pg.getViewport({scale})}).promise;
+  }
+}
+
+/* ===================================================================
+   8. CHECK ENGINE
+   =================================================================== */
+function runCheck(){
+  if(!drawPages.length){toast('请先上传图纸');return}
+  if(!regKeywords.length){toast('请先上传规范文件并提取关键词');return}
+  checkIssues=[];checkTypos=[];checkUnits=[];
+
+  const fullText=drawPages.map(p=>p.text).join('');
+  // Preserve page mapping for full text search
+  const pageMap=[];let offset=0;
+  for(const dp of drawPages){pageMap.push({pageNum:dp.pageNum,start:offset,end:offset+dp.text.length});offset+=dp.text.length+1;}
+
+  // 1. Keyword check (exact match)
+  for(const kw of regKeywords){
+    if(!fullText.includes(kw)){
+      // Find which regulation(s) this keyword came from
+      const srcRegs=regFiles.filter(f=>f.text.includes(kw)).map(f=>f.name.replace(/\.pdf$/i,''));
+      checkIssues.push({keyword:kw,sources:srcRegs.length?srcRegs:['(规范库)']});
+    }
+  }
+
+  // 2. Typo detection
+  for(const [wrong,correct] of BUILTIN_TYPOS){
+    let idx=0;
+    while(idx<fullText.length){
+      const pos=fullText.indexOf(wrong,idx);if(pos===-1)break;
+      const pgInfo=findPage(pos,pageMap);const ctx=getContext(fullText,pos,wrong.length);
+      checkTypos.push({wrong,correct,pageNum:pgInfo?pgInfo.pageNum:1,context:ctx});
+      idx=pos+1;
+    }
+  }
+
+  // 3. Unit format
+  const uRe=/(\d+(?:\.\d+)?)\s*(m²|m³|m{1,2}|cm|mm|km|kg|kN|MPa|℃|°)(?![a-zA-Z一-鿿])/g;
+  let m;
+  while((m=uRe.exec(fullText))!==null){
+    if(!/^\d+(?:\.\d+)?\s+(?:m²|m³|m{1,2}|cm|mm|km|kg|kN|MPa|℃|°)/.test(m[0])){
+      const pgInfo=findPage(m.index,pageMap);
+      checkUnits.push({wrong:m[0],correct:m[1]+' '+m[2],pageNum:pgInfo?pgInfo.pageNum:1,context:getContext(fullText,m.index,m[0].length)});
+    }
+  }
+
+  renderResults();showResBar();
+  // Switch to issues tab if there are issues, else typos
+  if(checkIssues.length>0)switchTab('issues');else switchTab('typos');
+  toast('核对完成 · '+checkIssues.length+'个不合理项 · '+(checkTypos.length+checkUnits.length)+'个文本错误');
+}
+
+function findPage(pos,pageMap){
+  for(const pm of pageMap){if(pos>=pm.start&&pos<pm.end)return pm;}
+  // find closest
+  for(const pm of pageMap){if(pos<pm.start)return pm;}
+  return pageMap[pageMap.length-1];
+}
+function getContext(text,pos,len){
+  const s=Math.max(0,pos-12),e=Math.min(text.length,pos+len+12);
+  return (s>0?'…':'')+text.slice(s,e)+(e<text.length?'…':'');
+}
+
+/* ===================================================================
+   9. RENDER RESULTS
+   =================================================================== */
+function renderResults(){
+  $('badgeIss').textContent=checkIssues.length;
+  $('badgeTyp').textContent=checkTypos.length+checkUnits.length;
+
+  // Summary
+  let sum='<div class="sum-row">';
+  sum+='<div class="chip info">图纸：'+esc(drawFileName)+'</div>';
+  sum+='<div class="chip info">关键词库：'+regKeywords.length+'个</div>';
+  if(checkIssues.length)sum+='<div class="chip warn">不合理项：'+checkIssues.length+'条</div>';
+  else sum+='<div class="chip ok">规范合规</div>';
+  if(checkTypos.length+checkUnits.length)sum+='<div class="chip warn">文本错误：'+(checkTypos.length+checkUnits.length)+'处</div>';
+  else sum+='<div class="chip ok">文本无错误</div>';
+  sum+='</div>';$('sumRow').innerHTML=sum;
+
+  renderIssues();renderTypos();
+}
+
+function renderIssues(){
+  const list=$('resList');
+  if(checkIssues.length===0){
+    list.innerHTML='<div class="empty" style="padding:20px;"><div style="font-size:1.5rem;opacity:0.3;">&#10003;</div><div>所有关键词均已在图纸中找到</div></div>';
+    return;
+  }
+  list.innerHTML=checkIssues.map((iss,i)=>`
+    <div class="iss" data-idx="${i}" onclick="jumpToIssue(${i})">
+      <div class="is">缺失关键词 <span class="ikw">${esc(iss.keyword)}</span></div>
+      <div class="im">来源规范：${iss.sources.map(s=>esc(s)).join('、')}</div>
+      <div class="ip">&#128206; 点击在图纸中查找相关位置</div>
     </div>
-  );
-};
+  `).join('');
+}
 
-export default App;
+function renderTypos(){
+  const list=$('resList');
+  const all=[...checkTypos,...checkUnits.map(u=>({wrong:u.wrong,correct:u.correct,pageNum:u.pageNum,context:u.context,isUnit:true}))];
+  if(all.length===0){
+    list.innerHTML='<div class="empty" style="padding:20px;"><div style="font-size:1.5rem;opacity:0.3;">&#10003;</div><div>未发现文本错误</div></div>';
+    return;
+  }
+  list.innerHTML=all.map((t,i)=>`
+    <div class="tyi" data-idx="${i}" onclick="jumpToTypo(${i})">
+      <span class="tw">${esc(t.wrong)}</span><span class="ta">→</span><span class="tc">${esc(t.correct)}</span>
+      <span class="tp" title="${esc(t.context)}">p.${t.pageNum} ${esc(t.context)}</span>
+    </div>
+  `).join('');
+}
+
+/* ===================================================================
+   10. TAB SWITCHING
+   =================================================================== */
+function switchTab(tab){
+  activeTab=tab;$('tabIss').classList.toggle('active',tab==='issues');$('tabTyp').classList.toggle('active',tab==='typos');
+  if(tab==='issues')renderIssues();else renderTypos();
+}
+
+function showResBar(){$('resBar').classList.remove('hidden');}
+function toggleResBar(){
+  const bar=$('resBar');const btn=$('btnToggleRes');
+  if(bar.style.maxHeight==='40px'){
+    bar.style.maxHeight='44%';btn.innerHTML='折叠 &#9650;';
+  }else{
+    bar.style.maxHeight='40px';btn.innerHTML='展开 &#9660;';
+  }
+}
+
+/* ===================================================================
+   11. PAGE NAVIGATION (click to jump)
+   =================================================================== */
+function jumpToIssue(idx){
+  const iss=checkIssues[idx];if(!iss)return;
+  // Search for where this keyword might appear in the drawing
+  // Since it's missing, we can't jump to it. Jump to a page where related content might be.
+  // For missing keywords, jump to page 1 as default, or find a page with related terms.
+  let targetPage=1;
+  // Try to find partial match in any page
+  const kwChars=[...iss.keyword];
+  for(const dp of drawPages){
+    const matchCount=kwChars.filter(c=>dp.text.includes(c)).length;
+    if(matchCount>=kwChars.length*0.5){targetPage=dp.pageNum;break;}
+  }
+  navigateToPage(targetPage);
+  highlightResultsItem(idx,'iss');
+}
+
+function jumpToTypo(idx){
+  const all=[...checkTypos,...checkUnits.map(u=>({...u,isUnit:true}))];
+  const t=all[idx];if(!t)return;
+  navigateToPage(t.pageNum);
+  highlightResultsItem(idx,'tyi');
+  // Highlight on PDF
+  highlightInPDF(t.pageNum,t.wrong);
+}
+
+function navigateToPage(pageNum){
+  const wrap=$('pw'+pageNum);if(!wrap)return;
+  wrap.scrollIntoView({behavior:'smooth',block:'center'});
+  // Brief highlight animation on the page
+  wrap.style.boxShadow='0 0 30px rgba(201,169,92,0.5), 0 3px 16px rgba(0,0,0,0.45)';
+  setTimeout(()=>{wrap.style.boxShadow='0 3px 16px rgba(0,0,0,0.45)';},1500);
+}
+
+function highlightInPDF(pageNum,text){
+  const dp=drawPages.find(p=>p.pageNum===pageNum);if(!dp)return;
+  const wrap=$('pw'+pageNum);if(!wrap)return;
+  const hlLayer=$('hl'+pageNum);if(!hlLayer)return;
+  hlLayer.innerHTML='';
+
+  // Find matching text items
+  const scale=parseFloat(wrap.style.width)/dp.viewport.width;
+  for(const item of dp.items){
+    if(item.str.includes(text)||text.includes(item.str)){
+      const tx=item.transform;
+      const x=tx[4]*scale;
+      const y=(dp.viewport.height-tx[5])*scale-item.height*scale;
+      const w=item.width*scale+2;
+      const h=item.height*scale+2;
+      const rect=document.createElement('div');rect.className='hl-rect';
+      rect.style.left=x+'px';rect.style.top=y+'px';rect.style.width=w+'px';rect.style.height=h+'px';
+      hlLayer.appendChild(rect);
+    }
+  }
+  // Clear highlights after a few seconds
+  setTimeout(()=>{hlLayer.innerHTML='';},4000);
+}
+
+function highlightResultsItem(idx,cls){
+  document.querySelectorAll('.'+cls).forEach(el=>el.classList.remove('act'));
+  const el=document.querySelector('.'+cls+'[data-idx="'+idx+'"]');
+  if(el)el.classList.add('act');
+}
+
+/* ===================================================================
+   12. RESET
+   =================================================================== */
+function resetAll(){
+  if(!confirm('确定清除所有数据（规范库、关键词、图纸）吗？此操作不可恢复。'))return;
+  regFiles=[];regKeywords=[];drawPages=[];drawFileName='';drawPDF=null;
+  checkIssues=[];checkTypos=[];checkUnits=[];
+  saveRegs();saveKW();renderRegUI();
+  $('kwBox').style.display='none';$('kwBox').innerHTML='';
+  $('drawInfo').style.display='none';$('drawTxt').textContent='拖拽或点击上传图纸 PDF';
+  $('drawZone').classList.remove('done');updateCheckBtn();
+  $('pdfEmpty').classList.remove('hidden');$('pdfPages').innerHTML='';
+  $('resBar').classList.add('hidden');
+  toast('所有数据已清除');
+}
+
+/* ===================================================================
+   13. INIT
+   =================================================================== */
+(function init(){
+  renderRegUI();
+  if(regKeywords.length){
+    const box=$('kwBox');box.style.display='block';
+    box.innerHTML=`<div class="sec-title" style="font-size:0.78rem;">已提取关键词（${regKeywords.length}个）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px;max-height:80px;overflow-y:auto;">${regKeywords.slice(0,60).map(k=>`<span style="font-size:0.68rem;padding:2px 6px;border-radius:3px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(201,169,92,0.2);">${esc(k)}</span>`).join('')}${regKeywords.length>60?'<span style="font-size:0.68rem;color:var(--text-dim);padding:2px 6px;">...共'+regKeywords.length+'个</span>':''}</div>`;
+  }
+  updateCheckBtn();
+})();
+</script>
+</body>
+</html>
