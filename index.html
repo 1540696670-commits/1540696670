@@ -3,204 +3,257 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>审图网站</title>
+<title>AI审图系统 v5</title>
 <style>
-  :root {
-    --bg:#08080d; --surface:rgba(255,255,255,0.025); --surface-hover:rgba(255,255,255,0.05);
-    --border:rgba(255,255,255,0.07); --border-active:rgba(255,255,255,0.14);
-    --text:rgba(255,255,255,0.82); --text-dim:rgba(255,255,255,0.45); --text-bright:rgba(255,255,255,0.93);
-    --accent:#c9a95c; --accent-dim:rgba(201,169,92,0.15); --accent-glow:rgba(201,169,92,0.35);
-    --danger:#d9705a; --danger-dim:rgba(217,112,90,0.15); --success:#7eb896; --info:#6ba3c7;
-    --radius:6px; --radius-lg:10px;
-    --font-heading:"Playfair Display","STSong","Songti SC","Noto Serif SC",serif;
-    --font-body:"Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-  }
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
-  .app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+:root {
+  --bg:#08080d; --surface:rgba(255,255,255,0.025); --surface-hover:rgba(255,255,255,0.05);
+  --border:rgba(255,255,255,0.07); --border-active:rgba(255,255,255,0.14);
+  --text:rgba(255,255,255,0.82); --text-dim:rgba(255,255,255,0.45); --text-bright:rgba(255,255,255,0.93);
+  --accent:#c9a95c; --accent-dim:rgba(201,169,92,0.15); --accent-glow:rgba(201,169,92,0.35);
+  --danger:#d9705a; --danger-dim:rgba(217,112,90,0.15); --success:#7eb896; --info:#6ba3c7;
+  --radius:6px; --radius-lg:10px;
+  --font-heading:"Playfair Display","STSong","Songti SC","Noto Serif SC",serif;
+  --font-body:"Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
 
-  /* Header */
-  .header{flex-shrink:0;padding:12px 20px 0;border-bottom:1px solid var(--border)}
-  .header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
-  .header h1{font-family:var(--font-heading);font-size:1.4rem;font-weight:700;color:var(--text-bright);letter-spacing:0.06em}
-  .header .sub{font-size:0.72rem;color:var(--text-dim);letter-spacing:0.12em;text-transform:uppercase}
+/* ===== APP LAYOUT ===== */
+.app{display:flex;height:100vh;overflow:hidden}
 
-  /* Mode Tabs */
-  .mode-tabs{display:flex;gap:0}
-  .mode-tab{padding:8px 18px;font-size:0.82rem;cursor:pointer;border:none;background:transparent;color:var(--text-dim);border-bottom:2px solid transparent;transition:all 0.2s;font-family:var(--font-body);letter-spacing:0.03em;white-space:nowrap}
-  .mode-tab:hover{color:var(--text);border-bottom-color:rgba(255,255,255,0.15)}
-  .mode-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
-  .mode-tab .mt-badge{font-size:0.62rem;padding:1px 5px;border-radius:100px;margin-left:4px;background:var(--accent-dim);color:var(--accent);vertical-align:middle}
+/* ===== SIDEBAR ===== */
+.sidebar{width:220px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(0,0,0,0.25);border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden}
+.sidebar-hd{padding:16px 16px 12px;border-bottom:1px solid var(--border)}
+.sidebar-hd h1{font-family:var(--font-heading);font-size:1.15rem;font-weight:700;color:var(--text-bright);letter-spacing:0.05em}
+.sidebar-hd .ver{font-size:0.62rem;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-top:1px}
+.sidebar-nav{flex:1;padding:6px 0}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;color:var(--text-dim);transition:all 0.15s;border-left:2px solid transparent;font-size:0.85rem;user-select:none}
+.sidebar-item:hover{color:var(--text);background:var(--surface-hover)}
+.sidebar-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-dim)}
+.sidebar-item .si-ic{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+.sidebar-ft{padding:10px 16px;border-top:1px solid var(--border)}
+.sidebar-ft .kb-status{font-size:0.7rem;display:flex;align-items:center;gap:6px}
+.kb-dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.kb-dot.on{background:var(--success);box-shadow:0 0 6px rgba(126,184,150,0.5)}
+.kb-dot.off{background:var(--danger);box-shadow:0 0 6px rgba(217,112,90,0.4)}
+.kb-dot.checking{background:var(--accent);animation:kbPulse 0.8s ease-in-out infinite}
+@keyframes kbPulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
-  /* Layout */
-  .main{flex:1;display:flex;overflow:hidden}
-  .panel-left{width:38%;min-width:340px;max-width:480px;border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
-  .panel-right{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#05050a}
-  @media(max-width:900px){
-    .main{flex-direction:column}
-    .panel-left{width:100%;min-width:0;max-width:none;border-right:none;border-bottom:1px solid var(--border);max-height:42vh}
-    .panel-right{max-height:58vh}
-    .header{padding:8px 10px 0}.header h1{font-size:1.1rem}
-    .mode-tab{padding:6px 10px;font-size:0.72rem}
-  }
+/* ===== MAIN AREA ===== */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
-  /* Sections */
-  .section{padding:16px 20px;border-bottom:1px solid var(--border)}
-  .sec-title{font-family:var(--font-heading);font-size:0.88rem;font-weight:600;color:var(--text-bright);margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:0.03em}
-  .sec-title .ic{color:var(--accent)}
-  .sec-desc{font-size:0.73rem;color:var(--text-dim);margin-bottom:10px;line-height:1.5}
+/* ===== TOP BAR ===== */
+.top-bar{height:52px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--border);background:var(--bg)}
+.top-bar .section-label{font-family:var(--font-heading);font-size:0.95rem;color:var(--text-bright);white-space:nowrap;letter-spacing:0.03em}
+.top-bar .spacer{flex:1}
+.upload-mini{display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px dashed var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.2s;position:relative;font-size:0.76rem;color:var(--text-dim);white-space:nowrap;max-width:320px;overflow:hidden}
+.upload-mini:hover{border-color:var(--accent);color:var(--text)}
+.upload-mini.has-file{border-color:var(--success);border-style:solid;color:var(--success)}
+.upload-mini input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-mini .um-thumb{width:32px;height:42px;border-radius:2px;overflow:hidden;background:#fff;flex-shrink:0;display:none}
+.upload-mini .um-thumb.show{display:block}
+.upload-mini .um-thumb canvas{width:100%;height:100%}
+.upload-mini .um-info{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.upload-mini .um-info .um-name{font-size:0.74rem;color:var(--text)}
+.upload-mini .um-info .um-meta{font-size:0.66rem;color:var(--text-dim)}
 
-  /* Buttons */
-  .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 15px;border-radius:var(--radius);font-size:0.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);letter-spacing:0.02em;transition:all 0.2s;white-space:nowrap}
-  .btn:hover{border-color:var(--border-active);background:var(--surface-hover)}
-  .btn-primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
-  .btn-primary:hover{background:#d4b56a;border-color:#d4b56a;box-shadow:0 0 20px var(--accent-glow)}
-  .btn-primary:disabled{opacity:0.35;cursor:not-allowed;box-shadow:none}
-  .btn-sm{padding:5px 10px;font-size:0.72rem}
-  .btn-danger{border-color:var(--danger);color:var(--danger)}.btn-danger:hover{background:var(--danger-dim)}
-  .btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+/* ===== PANEL CONTAINER ===== */
+.panel-container{flex-shrink:0;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.01);overflow:hidden;transition:max-height 0.3s ease,opacity 0.25s ease,padding 0.3s ease}
+.panel-container.closed{max-height:0!important;opacity:0;border-bottom-color:transparent}
+.panel-inner{padding:14px 20px;max-height:420px;overflow-y:auto}
+.panel-inner .section{margin-bottom:14px}
+.panel-inner .section:last-child{margin-bottom:0}
+.panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.panel-hd .ph-title{font-family:var(--font-heading);font-size:0.9rem;font-weight:600;color:var(--text-bright);letter-spacing:0.03em}
+.panel-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:0.85rem;transition:all 0.15s}
+.panel-close:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-dim)}
 
-  /* Upload zone */
-  .up-zone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:22px 14px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface);position:relative}
-  .up-zone:hover,.up-zone.drag{border-color:var(--accent);background:var(--accent-dim)}
-  .up-zone.done{border-color:var(--success);border-style:solid;background:rgba(126,184,150,0.05)}
-  .up-zone .up-ic{font-size:1.5rem;margin-bottom:4px;opacity:0.5}
-  .up-zone .up-txt{font-size:0.8rem;color:var(--text-dim)}
-  .up-zone .up-hint{font-size:0.68rem;color:var(--text-dim);opacity:0.5;margin-top:2px}
-  .up-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+/* ===== SECTION COMPONENTS ===== */
+.sec-title{font-family:var(--font-heading);font-size:0.85rem;font-weight:600;color:var(--text-bright);margin-bottom:8px;letter-spacing:0.03em}
+.sec-desc{font-size:0.73rem;color:var(--text-dim);margin-bottom:10px;line-height:1.5}
 
-  /* Input fields */
-  .inp{width:100%;padding:8px 10px;border-radius:var(--radius);font-size:0.8rem;border:1px solid var(--border);background:var(--surface);color:var(--text);outline:none;transition:border-color 0.2s;margin-bottom:6px}
-  .inp:focus{border-color:var(--accent)}
-  .inp::placeholder{color:var(--text-dim);opacity:0.6}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--radius);font-size:0.78rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);letter-spacing:0.02em;transition:all 0.2s;white-space:nowrap}
+.btn:hover{border-color:var(--border-active);background:var(--surface-hover)}
+.btn-primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
+.btn-primary:hover{background:#d4b56a;border-color:#d4b56a;box-shadow:0 0 20px var(--accent-glow)}
+.btn-primary:disabled{opacity:0.35;cursor:not-allowed;box-shadow:none}
+.btn-sm{padding:5px 10px;font-size:0.72rem}
+.btn-danger{border-color:var(--danger);color:var(--danger)}.btn-danger:hover{background:var(--danger-dim)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 
-  /* Reg file list */
-  .rf-item{display:flex;align-items:center;gap:6px;padding:7px 10px;margin-top:5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:0.78rem}
-  .rf-item .fn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
-  .rf-item .fi{font-size:0.7rem;color:var(--text-dim);flex-shrink:0}
+/* Upload zone (panel) */
+.up-zone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:16px 12px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface);position:relative}
+.up-zone:hover,.up-zone.drag{border-color:var(--accent);background:var(--accent-dim)}
+.up-zone.done{border-color:var(--success);border-style:solid;background:rgba(126,184,150,0.05)}
+.up-zone .up-ic{font-size:1.3rem;margin-bottom:2px;opacity:0.5}
+.up-zone .up-txt{font-size:0.78rem;color:var(--text-dim)}
+.up-zone .up-hint{font-size:0.66rem;color:var(--text-dim);opacity:0.5;margin-top:2px}
+.up-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 
-  /* PDF Viewer */
-  .pdf-viewer{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px}
-  .pdf-pwrap{position:relative;margin:0 auto 12px;box-shadow:0 3px 16px rgba(0,0,0,0.45);background:#fff;line-height:0}
-  .pdf-pwrap canvas{display:block;width:100%;height:auto}
-  .pdf-pwrap .hl-layer{position:absolute;inset:0;pointer-events:none}
-  .pdf-pwrap .hl-rect{position:absolute;background:rgba(217,112,90,0.3);border:2px solid rgba(255,120,80,0.75);border-radius:2px;animation:hlPulse 1.2s ease-in-out infinite}
-  @keyframes hlPulse{0%,100%{background:rgba(217,112,90,0.25)}50%{background:rgba(255,130,90,0.5)}}
+.inp{width:100%;padding:8px 10px;border-radius:var(--radius);font-size:0.8rem;border:1px solid var(--border);background:var(--surface);color:var(--text);outline:none;transition:border-color 0.2s;margin-bottom:6px}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--text-dim);opacity:0.6}
+.sel{width:100%;padding:8px 10px;border-radius:var(--radius);font-size:0.8rem;border:1px solid var(--border);background:var(--surface);color:var(--text);outline:none;cursor:pointer;margin-bottom:6px}
+.sel:focus{border-color:var(--accent)}
+.sel option{background:#1a1a24;color:var(--text)}
 
-  /* Results bar */
-  .res-bar{border-top:1px solid var(--border);background:var(--bg);max-height:44%;overflow-y:auto;flex-shrink:0}
-  .res-hd{padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:2}
-  .res-hd .tab{padding:5px 12px;border-radius:100px;font-size:0.76rem;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);transition:all 0.15s;white-space:nowrap}
-  .res-hd .tab.active,.res-hd .tab:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
-  .res-hd .tab .badge{padding:1px 6px;border-radius:100px;font-size:0.66rem;margin-left:3px;background:var(--danger-dim);color:var(--danger)}
-  .res-list{padding:8px 14px;font-size:0.8rem}
+.rf-item{display:flex;align-items:center;gap:6px;padding:6px 10px;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:0.76rem}
+.rf-item .fn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.rf-item .fi{font-size:0.68rem;color:var(--text-dim);flex-shrink:0}
 
-  /* Issue cards */
-  .iss{cursor:pointer;padding:9px 11px;margin-bottom:5px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:var(--radius);transition:all 0.15s;font-size:0.8rem}
-  .iss:hover,.iss.act{border-color:var(--danger);background:var(--danger-dim);box-shadow:0 0 10px rgba(217,112,90,0.1)}
-  .iss .is{font-weight:600;color:var(--text-bright);margin-bottom:2px}
-  .iss .im{font-size:0.72rem;color:var(--text-dim)}
-  .iss .ikw{display:inline-block;background:var(--danger-dim);color:var(--danger);padding:1px 5px;border-radius:3px;font-size:0.68rem;margin:0 1px}
-  .iss .ip{font-size:0.7rem;color:var(--info);margin-top:2px}
+/* ===== PDF AREA ===== */
+.pdf-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#05050a}
+.pdf-viewer{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px}
+.pdf-pwrap{position:relative;margin:0 auto 12px;box-shadow:0 3px 16px rgba(0,0,0,0.45);background:#fff;line-height:0}
+.pdf-pwrap canvas{display:block;width:100%;height:auto}
+.pdf-pwrap .svg-overlay{position:absolute;inset:0;pointer-events:none;z-index:5}
+.pdf-pwrap .error-rect{fill:rgba(255,60,60,0.25);stroke:#ff3c3c;stroke-width:2.5;animation:errPulse 1.5s ease-in-out infinite}
+.pdf-pwrap .hl-rect{position:absolute;background:rgba(217,112,90,0.3);border:2px solid rgba(255,120,80,0.75);border-radius:2px;animation:hlPulse 1.2s ease-in-out infinite}
+@keyframes errPulse{0%,100%{fill:rgba(255,60,60,0.2)}50%{fill:rgba(255,60,60,0.45)}}
+@keyframes hlPulse{0%,100%{background:rgba(217,112,90,0.25)}50%{background:rgba(255,130,90,0.5)}}
+.pdf-pwrap.err-highlight{box-shadow:0 0 30px rgba(255,60,60,0.45),0 3px 16px rgba(0,0,0,0.45)!important}
 
-  /* Typo items */
-  .tyi{cursor:pointer;padding:7px 9px;margin-bottom:3px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);transition:all 0.15s;font-size:0.78rem;display:flex;align-items:center;gap:8px}
-  .tyi:hover,.tyi.act{border-color:var(--accent);background:var(--accent-dim)}
-  .tyi .tw{color:var(--danger);text-decoration:line-through;min-width:50px;font-size:0.8rem}
-  .tyi .ta{color:var(--text-dim)}
-  .tyi .tc{color:var(--success);font-weight:600;font-size:0.8rem}
-  .tyi .tp{flex:1;text-align:right;font-size:0.68rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ===== RESULTS BAR ===== */
+.res-bar{border-top:1px solid var(--border);background:var(--bg);max-height:46%;overflow-y:auto;flex-shrink:0}
+.res-hd{padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:2}
+.res-hd .tab{padding:5px 12px;border-radius:100px;font-size:0.76rem;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);transition:all 0.15s;white-space:nowrap}
+.res-hd .tab.active,.res-hd .tab:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.res-hd .tab .badge{padding:1px 6px;border-radius:100px;font-size:0.66rem;margin-left:3px;background:var(--danger-dim);color:var(--danger)}
+.res-list{padding:8px 14px}
 
-  /* Summary */
-  .sum-row{display:flex;gap:6px;flex-wrap:wrap;padding:6px 14px}
-  .chip{padding:5px 12px;border-radius:100px;font-size:0.74rem;border:1px solid var(--border);background:var(--surface)}
-  .chip.warn{border-color:var(--danger);background:var(--danger-dim);color:var(--danger)}
-  .chip.ok{border-color:var(--success);background:rgba(126,184,150,0.1);color:var(--success)}
-  .chip.info{border-color:var(--info);background:rgba(107,163,199,0.1);color:var(--info)}
+.sum-row{display:flex;gap:6px;flex-wrap:wrap;padding:6px 14px}
+.chip{padding:5px 12px;border-radius:100px;font-size:0.74rem;border:1px solid var(--border);background:var(--surface)}
+.chip.warn{border-color:var(--danger);background:var(--danger-dim);color:var(--danger)}
+.chip.ok{border-color:var(--success);background:rgba(126,184,150,0.1);color:var(--success)}
+.chip.info{border-color:var(--info);background:rgba(107,163,199,0.1);color:var(--info)}
 
-  /* ===== NEW v3 STYLES ===== */
+/* Issue/typo cards */
+.iss{cursor:pointer;padding:9px 11px;margin-bottom:5px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:var(--radius);transition:all 0.15s;font-size:0.8rem}
+.iss:hover,.iss.act{border-color:var(--danger);background:var(--danger-dim)}
+.iss .is{font-weight:600;color:var(--text-bright);margin-bottom:2px}
+.iss .im{font-size:0.72rem;color:var(--text-dim)}
+.iss .ikw{display:inline-block;background:var(--danger-dim);color:var(--danger);padding:1px 5px;border-radius:3px;font-size:0.68rem;margin:0 1px}
+.tyi{cursor:pointer;padding:7px 9px;margin-bottom:3px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);transition:all 0.15s;font-size:0.78rem;display:flex;align-items:center;gap:8px}
+.tyi:hover,.tyi.act{border-color:var(--accent);background:var(--accent-dim)}
+.tyi .tw{color:var(--danger);text-decoration:line-through;min-width:50px;font-size:0.8rem}
+.tyi .ta{color:var(--text-dim)}
+.tyi .tc{color:var(--success);font-weight:600;font-size:0.8rem}
+.tyi .tp{flex:1;text-align:right;font-size:0.68rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* Result table */
-  .res-table{width:100%;border-collapse:collapse;font-size:0.76rem;margin:6px 0}
-  .res-table th,.res-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
-  .res-table th{font-size:0.7rem;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;position:sticky;top:0;background:var(--bg)}
-  .res-table tr:hover td{background:var(--surface-hover)}
-  .res-table .td-pass{color:var(--success);font-weight:600}
-  .res-table .td-fail{color:var(--danger);font-weight:600}
-  .res-table .td-src{font-size:0.68rem;color:var(--text-dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .res-table .td-clause{max-width:300px;line-height:1.4}
+/* Results table */
+.res-table{width:100%;border-collapse:collapse;font-size:0.76rem;margin:6px 0}
+.res-table th,.res-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+.res-table th{font-size:0.7rem;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;position:sticky;top:0;background:var(--bg)}
+.res-table tr:hover td{background:var(--surface-hover)}
+.res-table .td-pass{color:var(--success);font-weight:600}
+.res-table .td-fail{color:var(--danger);font-weight:600}
+.res-table .td-src{font-size:0.68rem;color:var(--text-dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res-table .td-clause{max-width:320px;line-height:1.4}
 
-  /* Code/highlight text */
-  .hl-text{background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;font-size:0.85em}
-  .kw-text{background:var(--danger-dim);color:var(--danger);padding:1px 4px;border-radius:3px;font-size:0.85em}
+/* ===== SEARCH RESULTS (LARGE FONT) ===== */
+.search-result-item{padding:16px 0;border-bottom:1px solid var(--border)}
+.search-result-item:last-child{border-bottom:none}
+.search-result-source{font-size:0.85rem;color:var(--accent);margin-bottom:8px;font-weight:600}
+.search-result-content{font-size:16px;line-height:1.5;color:var(--text);margin-bottom:6px}
+.search-result-meta{display:flex;gap:12px;font-size:0.78rem;color:var(--text-dim)}
 
-  /* Select dropdown */
-  .sel{width:100%;padding:8px 10px;border-radius:var(--radius);font-size:0.8rem;border:1px solid var(--border);background:var(--surface);color:var(--text);outline:none;cursor:pointer;margin-bottom:6px}
-  .sel:focus{border-color:var(--accent)}
-  .sel option{background:#1a1a24;color:var(--text)}
+/* ===== ERROR CARDS (STRUCTURED NUMBERED LIST) ===== */
+.error-card{padding:14px 16px;margin-bottom:10px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:var(--radius);cursor:pointer;transition:all 0.15s}
+.error-card:hover{background:var(--danger-dim);border-color:var(--danger);box-shadow:0 0 12px rgba(217,112,90,0.08)}
+.error-card .ec-num{font-size:0.9rem;font-weight:700;color:var(--danger);margin-bottom:8px}
+.error-card .ec-desc{font-size:0.88rem;color:var(--text);margin-bottom:8px;line-height:1.5}
+.error-card .ec-clause{font-size:0.82rem;color:var(--accent);margin-bottom:6px;padding:8px 10px;background:var(--accent-dim);border-radius:var(--radius);line-height:1.4}
+.error-card .ec-loc{font-size:0.74rem;color:var(--text-dim);display:flex;align-items:center;gap:4px}
 
-  /* Progress */
-  .progress-wrap{height:4px;background:var(--border);border-radius:10px;margin:8px 0;overflow:hidden}
-  .progress-bar{height:100%;background:var(--accent);border-radius:10px;transition:width 0.3s;width:0%}
+.hl-text{background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;font-size:0.85em}
+.kw-text{background:var(--danger-dim);color:var(--danger);padding:1px 4px;border-radius:3px;font-size:0.85em}
 
-  /* Toast */
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a24;border:1px solid var(--border-active);padding:10px 22px;border-radius:100px;font-size:0.8rem;color:var(--text);z-index:200;box-shadow:0 8px 30px rgba(0,0,0,0.4);animation:tIn 0.25s ease,tOut 0.25s ease 2s forwards}
-  @keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-  @keyframes tOut{from{opacity:1}to{opacity:0}}
+/* Progress */
+.progress-wrap{height:4px;background:var(--border);border-radius:10px;margin:8px 0;overflow:hidden}
+.progress-bar{height:100%;background:var(--accent);border-radius:10px;transition:width 0.3s;width:0%}
 
-  /* KB indicator */
-  .kb-status{display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--text-dim)}
-  .kb-dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0}
-  .kb-dot.on{background:var(--success);box-shadow:0 0 6px rgba(126,184,150,0.5)}
-  .kb-dot.off{background:var(--danger);box-shadow:0 0 6px rgba(217,112,90,0.4)}
-  .kb-dot.checking{background:var(--accent);animation:kbPulse 0.8s ease-in-out infinite}
-  @keyframes kbPulse{0%,100%{opacity:1}50%{opacity:0.3}}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a24;border:1px solid var(--border-active);padding:10px 22px;border-radius:100px;font-size:0.8rem;color:var(--text);z-index:200;box-shadow:0 8px 30px rgba(0,0,0,0.4);animation:tIn 0.25s ease,tOut 0.25s ease 2s forwards}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes tOut{from{opacity:1}to{opacity:0}}
 
-  /* Misc */
-  ::-webkit-scrollbar{width:5px}
-  ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:10px}
-  ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.12)}
-  .hidden{display:none!important}
-  .empty{text-align:center;padding:40px 20px;color:var(--text-dim)}
-  .empty .big{font-size:2.5rem;opacity:0.15;margin-bottom:8px}
-  details summary{font-size:0.73rem;color:var(--accent);cursor:pointer;margin-top:4px}
-  .mt-2{margin-top:8px}
-  .mt-4{margin-top:16px}
-  .mb-2{margin-bottom:8px}
+/* Misc */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.12)}
+.hidden{display:none!important}
+.empty{text-align:center;padding:40px 20px;color:var(--text-dim)}
+.empty .big{font-size:2.5rem;opacity:0.15;margin-bottom:8px}
+details summary{font-size:0.73rem;color:var(--accent);cursor:pointer;margin-top:4px}
+.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-4{margin-top:16px}
+.mb-2{margin-bottom:8px}
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-top">
-      <div><h1>审图网站</h1><div class="sub">Drawing Review System v4</div></div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span class="kb-status" id="kbStatus" title="知识库服务器连接状态">
-          <span class="kb-dot checking" id="kbDot"></span>
-          <span class="kb-status-text" id="kbStatusText">检测中...</span>
-        </span>
-        <button class="btn btn-sm btn-danger" onclick="resetAll()">重置全部数据</button>
+  <!-- ===== SIDEBAR ===== -->
+  <nav class="sidebar">
+    <div class="sidebar-hd">
+      <h1>AI审图系统</h1>
+      <div class="ver">Drawing Review v5</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-item active" data-mode="manage" onclick="switchMode('manage')">
+        <span class="si-ic">📚</span> 规范管理
+      </div>
+      <div class="sidebar-item" data-mode="smart" onclick="switchMode('smart')">
+        <span class="si-ic">🔬</span> 智能审图
+      </div>
+      <div class="sidebar-item" data-mode="scan" onclick="switchMode('scan')">
+        <span class="si-ic">⚡</span> 一键扫描
+      </div>
+      <div class="sidebar-item" data-mode="search" onclick="switchMode('search')">
+        <span class="si-ic">🔍</span> 规范检索
       </div>
     </div>
-    <div class="mode-tabs">
-      <button class="mode-tab active" onclick="switchMode('manage')" id="tabManage">&#128214; 规范管理</button>
-      <button class="mode-tab" onclick="switchMode('smart')" id="tabSmart">&#128300; 智能审图<span class="mt-badge">新</span></button>
-      <button class="mode-tab" onclick="switchMode('search')" id="tabSearch">&#128269; 规范检索<span class="mt-badge">新</span></button>
-      <button class="mode-tab" onclick="switchMode('scan')" id="tabScan">&#9889; 一键扫描<span class="mt-badge">新</span></button>
+    <div class="sidebar-ft">
+      <span class="kb-status" id="kbStatus" title="知识库服务器连接状态">
+        <span class="kb-dot checking" id="kbDot"></span>
+        <span id="kbStatusText">检测中...</span>
+      </span>
     </div>
-  </header>
+  </nav>
 
-  <div class="main">
-    <!-- ===== LEFT PANEL ===== -->
-    <div class="panel-left" id="panelLeft"><!-- mode panels injected here --></div>
+  <!-- ===== MAIN AREA ===== -->
+  <div class="main-area">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <span class="section-label" id="sectionLabel">规范管理</span>
+      <span class="spacer"></span>
+      <div class="upload-mini" id="quickUpload" title="拖拽PDF图纸到此处或点击上传">
+        <span style="font-size:1.1rem;">📄</span>
+        <span style="font-size:0.76rem;color:var(--text-dim);">拖拽图纸至此或点击上传</span>
+        <input type="file" id="quickDrawInput" accept=".pdf">
+      </div>
+      <div class="upload-mini" id="quickUploadDone" style="display:none;border-color:var(--success);border-style:solid;color:var(--success);">
+        <div class="um-thumb" id="umThumb"><canvas></canvas></div>
+        <div class="um-info">
+          <div class="um-name" id="umName"></div>
+          <div class="um-meta" id="umMeta"></div>
+        </div>
+        <span style="cursor:pointer;font-size:0.85rem;color:var(--text-dim);" onclick="event.stopPropagation();clearQuickDrawing();" title="清除图纸">✕</span>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="resetAll()">重置</button>
+    </div>
 
-    <!-- ===== RIGHT PANEL ===== -->
-    <div class="panel-right">
+    <!-- Panel Container -->
+    <div class="panel-container closed" id="panelContainer">
+      <div class="panel-inner" id="panelInner"></div>
+    </div>
+
+    <!-- PDF Area -->
+    <div class="pdf-area">
       <div class="pdf-viewer" id="pdfViewer">
         <div class="empty" id="pdfEmpty">
-          <div class="big">&#128196;</div><div>图纸 PDF 预览区</div>
+          <div class="big">📄</div>
+          <div>图纸 PDF 预览区</div>
           <div style="font-size:0.72rem;opacity:0.5;">上传图纸后在此预览，结果可点击跳转定位</div>
         </div>
         <div id="pdfPages"></div>
@@ -238,9 +291,9 @@ let regKeywords=[]; try{regKeywords=JSON.parse(localStorage.getItem(SK.REGKW)||'
 let drawPages=[],drawFileName='',drawPDF=null;
 let checkIssues=[],checkTypos=[],checkUnits=[];
 let activeMode='manage',activeTab='issues',currentHlPage=-1;
-// v3 state
 let smartRegText='',smartDrawPages=[],smartDrawPDF=null,smartDrawName='';
 let scanDrawPages=[],scanDrawPDF=null,scanDrawName='';
+let smartReqs=[],smartRooms=[];
 // KB server state
 const KB_SERVER='http://127.0.0.1:8765';
 let kbConnected=false,kbChecking=false;
@@ -288,157 +341,209 @@ function updateKBIndicator(state){
 }
 
 /* ===================================================================
-   3. MODE SWITCHING
+   2c. QUICK UPLOAD (shared drawing in top bar)
+   =================================================================== */
+function bindQuickUpload(){
+  const qu=$('quickUpload'),qdi=$('quickDrawInput');
+  qu.addEventListener('dragover',e=>{e.preventDefault();qu.style.borderColor='var(--accent)';qu.style.background='var(--accent-dim)';});
+  qu.addEventListener('dragleave',()=>{qu.style.borderColor='';qu.style.background='';});
+  qu.addEventListener('drop',e=>{e.preventDefault();qu.style.borderColor='';qu.style.background='';const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')loadQuickDrawing(f);else toast('请上传PDF文件');});
+  qdi.addEventListener('change',e=>{if(e.target.files[0])loadQuickDrawing(e.target.files[0]);});
+}
+
+async function loadQuickDrawing(file){
+  drawFileName=file.name;drawPages=[];drawPDF=null;
+  const qu=$('quickUpload'),qd=$('quickUploadDone');
+  qu.style.display='none';qd.style.display='flex';
+  $('umName').textContent=file.name;
+  $('umMeta').textContent='解析中...';
+  try{
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;drawPDF=pdf;
+    for(let i=1;i<=pdf.numPages;i++){
+      const pg=await pdf.getPage(i);const c=await pg.getTextContent();
+      drawPages.push({pageNum:i,text:c.items.map(it=>it.str).join(''),items:c.items,viewport:pg.getViewport({scale:1})});
+    }
+    $('umMeta').textContent=pdf.numPages+'页 · '+drawPages.reduce((s,p)=>s+p.text.length,0)+'字';
+    // Render thumbnail
+    const thumbWrap=$('umThumb'),cv=thumbWrap.querySelector('canvas');
+    thumbWrap.classList.add('show');
+    const pg0=await pdf.getPage(1),vp0=pg0.getViewport({scale:0.25});
+    cv.width=vp0.width;cv.height=vp0.height;
+    await pg0.render({canvasContext:cv.getContext('2d'),viewport:vp0}).promise;
+    // Render full PDF
+    await renderPDF(drawPDF,drawPages);
+    updateCheckBtn();toast('图纸解析完成，共'+pdf.numPages+'页');
+  }catch(e){toast('解析失败：'+e.message);clearQuickDrawing();}
+}
+
+function clearQuickDrawing(){
+  drawPages=[];drawFileName='';drawPDF=null;
+  $('quickUpload').style.display='flex';$('quickUploadDone').style.display='none';
+  $('umThumb').classList.remove('show');$('umName').textContent='';$('umMeta').textContent='';
+  $('pdfEmpty').classList.remove('hidden');$('pdfPages').innerHTML='';
+  $('resBar').classList.add('hidden');
+  updateCheckBtn();
+}
+
+/* ===================================================================
+   3. NAVIGATION & PANELS
    =================================================================== */
 function switchMode(mode){
   activeMode=mode;
-  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
-  const tabMap={manage:'tabManage',smart:'tabSmart',search:'tabSearch',scan:'tabScan'};
-  if($(tabMap[mode]))$(tabMap[mode]).classList.add('active');
-  renderLeftPanel();
-  // clear results
-  $('resBar').classList.add('hidden');$('resList').innerHTML='';$('sumRow').innerHTML='';
-  $('resHd').innerHTML='';
+  document.querySelectorAll('.sidebar-item').forEach(el=>el.classList.toggle('active',el.dataset.mode===mode));
+  const labels={manage:'规范管理',smart:'智能审图',scan:'一键扫描',search:'规范检索'};
+  $('sectionLabel').textContent=labels[mode]||'';
+  showPanel(mode);
+  $('resBar').classList.add('hidden');$('resList').innerHTML='';$('sumRow').innerHTML='';$('resHd').innerHTML='';
+  clearAllErrorHighlights();
 }
 
-function renderLeftPanel(){
-  const p=$('panelLeft');
-  switch(activeMode){
-    case 'manage': p.innerHTML=panelManageHTML(); bindManageEvents(); break;
-    case 'smart':  p.innerHTML=panelSmartHTML();  bindSmartEvents(); break;
-    case 'search': p.innerHTML=panelSearchHTML(); bindSearchEvents(); break;
-    case 'scan':   p.innerHTML=panelScanHTML();   bindScanEvents(); break;
+function showPanel(mode){
+  const pc=$('panelContainer'),pi=$('panelInner');
+  let html='';
+  switch(mode){
+    case 'manage': html=panelManageHTML(); break;
+    case 'smart':  html=panelSmartHTML();  break;
+    case 'search': html=panelSearchHTML(); break;
+    case 'scan':   html=panelScanHTML();   break;
   }
-  // Restore manage state
-  if(activeMode==='manage') renderRegUI();
+  pi.innerHTML=html;
+  pc.classList.remove('closed');
+  pc.style.maxHeight='440px';
+
+  // Bind events
+  switch(mode){
+    case 'manage': bindManageEvents(); break;
+    case 'smart':  bindSmartEvents();  break;
+    case 'search': bindSearchEvents(); break;
+    case 'scan':   bindScanEvents();   break;
+  }
+  if(mode==='manage') renderRegUI();
+}
+
+function hidePanel(){
+  const pc=$('panelContainer');
+  pc.classList.add('closed');
 }
 
 /* ===================================================================
    4. PANEL HTML TEMPLATES
    =================================================================== */
 function panelManageHTML(){return `
-  <div class="section">
-    <div class="sec-title"><span class="ic">&#128214;</span>规范库 · 上传本地规范PDF文件夹</div>
-    <div class="up-zone" id="regZone">
-      <div class="up-ic">&#128193;</div>
-      <div class="up-txt">点击选择包含规范 PDF 的文件夹</div>
-      <div class="up-hint">自动提取文字并生成审查关键词</div>
-      <input type="file" id="regInput" webkitdirectory multiple accept=".pdf">
-    </div>
-    <div id="regList" style="margin-top:6px;"></div>
-    <div class="text-dim" id="regSum" style="margin-top:4px;display:none;"></div>
-    <div class="btn-row">
-      <button class="btn btn-sm btn-primary" id="btnKW" disabled>提取关键词</button>
-      <button class="btn btn-sm btn-danger" id="btnClearReg" disabled>清空规范库</button>
-    </div>
-    <div id="kwBox" style="margin-top:8px;display:none;"></div>
+  <div class="panel-hd">
+    <span class="ph-title">📚 规范管理 · 上传规范库并提取关键词</span>
+    <span class="panel-close" onclick="hidePanel()" title="收起面板">✕</span>
   </div>
-  <div class="section">
-    <div class="sec-title"><span class="ic">&#128196;</span>上传图纸 PDF</div>
-    <div class="up-zone" id="drawZone">
-      <div class="up-ic">&#128206;</div>
-      <div class="up-txt" id="drawTxt">拖拽或点击上传图纸 PDF</div>
-      <div class="up-hint">.pdf 格式</div>
-      <input type="file" id="drawInput" accept=".pdf">
+  <div style="display:flex;gap:14px;">
+    <div style="flex:1;min-width:0;">
+      <div class="sec-title" style="font-size:0.78rem;">选择规范 PDF 文件夹</div>
+      <div class="up-zone" id="regZone" style="padding:12px 10px;">
+        <div class="up-ic">📁</div>
+        <div class="up-txt">点击选择包含规范 PDF 的文件夹</div>
+        <div class="up-hint">自动提取文字并生成审查关键词</div>
+        <input type="file" id="regInput" webkitdirectory multiple accept=".pdf">
+      </div>
+      <div id="regList" style="margin-top:4px;max-height:120px;overflow-y:auto;"></div>
+      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:2px;display:none;" id="regSum"></div>
+      <div class="btn-row">
+        <button class="btn btn-sm btn-primary" id="btnKW" disabled>提取关键词</button>
+        <button class="btn btn-sm btn-danger" id="btnClearReg" disabled>清空规范库</button>
+      </div>
+      <div id="kwBox" style="margin-top:6px;display:none;"></div>
     </div>
-    <div class="text-dim" id="drawInfo" style="margin-top:6px;display:none;"></div>
-    <button class="btn btn-primary" id="btnCheck" disabled style="width:100%;margin-top:12px;justify-content:center;padding:11px;">&#128269; 开始核对</button>
-  </div>
-  <div class="section">
-    <div class="sec-title"><span class="ic">&#9998;</span>错别字自动检测</div>
-    <div class="text-dim">已内置 36 个建筑行业常见错别字词条，核对时自动扫描。</div>
-    <details><summary>展开查看词库</summary>
-      <div id="typoDict" style="font-size:0.72rem;color:var(--text-dim);line-height:1.7;margin-top:4px;"></div>
-    </details>
+    <div style="flex:1;min-width:0;">
+      <div class="sec-title" style="font-size:0.78rem;">审图操作</div>
+      <div style="font-size:0.73rem;color:var(--text-dim);margin-bottom:6px;">当前图纸：<strong id="manageDrawName" style="color:var(--text);">${drawFileName?esc(drawFileName):'(未上传)'}</strong></div>
+      <button class="btn btn-primary" id="btnCheck" disabled style="width:100%;justify-content:center;padding:10px;">🔍 开始核对</button>
+      <div class="mt-2" style="font-size:0.73rem;color:var(--text-dim);">已内置 36 个建筑行业常见错别字词条，核对时自动扫描。${kbConnected?'<span style="color:var(--success);"> KB在线时将使用语义比对。</span>':''}</div>
+      <details class="mt-2"><summary style="font-size:0.72rem;">展开查看错别字词库</summary>
+        <div id="typoDict" style="font-size:0.7rem;color:var(--text-dim);line-height:1.7;"></div>
+      </details>
+    </div>
   </div>`;}
 
 function panelSmartHTML(){return `
-  <div class="section">
-    <div class="sec-title"><span class="ic">&#128300;</span>智能审图 · 面积合规检查</div>
-    <div class="sec-desc">上传一本规范 PDF 和一张图纸 PDF，自动提取房间面积要求并与图纸对比，检查是否符合规范。</div>
+  <div class="panel-hd">
+    <span class="ph-title">🔬 智能审图 · 面积合规检查${kbConnected?' <span style="font-size:0.68rem;color:var(--success);">(KB增强)</span>':''}</span>
+    <span class="panel-close" onclick="hidePanel()" title="收起面板">✕</span>
   </div>
-  <div class="section">
-    <div class="sec-title" style="font-size:0.8rem;">&#128214; 步骤1：加载规范 PDF</div>
-    <div class="sel-wrap mb-2">
+  <div style="display:flex;gap:14px;">
+    <div style="flex:1;min-width:0;">
+      <div class="sec-title" style="font-size:0.78rem;">步骤1：加载规范 PDF</div>
       <select class="sel" id="smartRegSelect"><option value="">-- 从规范库中选择（或下方上传） --</option></select>
+      <div class="up-zone" id="smartRegZone" style="padding:10px;">
+        <div class="up-txt" id="smartRegTxt">或直接上传规范 PDF</div>
+        <input type="file" id="smartRegInput" accept=".pdf">
+      </div>
+      <button class="btn btn-sm btn-primary mt-2" id="btnExtractReqs" disabled style="width:100%;">提取面积要求</button>
+      <div id="smartRegResult" style="margin-top:4px;font-size:0.74rem;"></div>
     </div>
-    <div class="up-zone" id="smartRegZone" style="padding:14px 10px;">
-      <div class="up-ic" style="font-size:1.2rem;">&#128214;</div>
-      <div class="up-txt" id="smartRegTxt">或直接上传规范 PDF</div>
-      <input type="file" id="smartRegInput" accept=".pdf">
+    <div style="flex:1;min-width:0;">
+      <div class="sec-title" style="font-size:0.78rem;">步骤2：上传图纸 PDF</div>
+      <div class="up-zone" id="smartDrawZone" style="padding:10px;">
+        <div class="up-txt" id="smartDrawTxt">拖拽或点击上传图纸 PDF</div>
+        <input type="file" id="smartDrawInput" accept=".pdf">
+      </div>
+      <button class="btn btn-sm btn-primary mt-2" id="btnExtractRooms" disabled style="width:100%;">提取房间信息</button>
+      <div id="smartDrawResult" style="margin-top:4px;font-size:0.74rem;"></div>
     </div>
-    <button class="btn btn-sm btn-primary mt-2" id="btnExtractReqs" disabled style="width:100%;">提取面积要求</button>
-    <div id="smartRegResult" style="margin-top:6px;font-size:0.76rem;"></div>
-  </div>
-  <div class="section">
-    <div class="sec-title" style="font-size:0.8rem;">&#128196; 步骤2：上传图纸 PDF</div>
-    <div class="up-zone" id="smartDrawZone" style="padding:14px 10px;">
-      <div class="up-ic" style="font-size:1.2rem;">&#128206;</div>
-      <div class="up-txt" id="smartDrawTxt">拖拽或点击上传图纸 PDF</div>
-      <input type="file" id="smartDrawInput" accept=".pdf">
+    <div style="flex:0 0 160px;display:flex;align-items:center;">
+      <button class="btn btn-primary" id="btnSmartReview" disabled style="width:100%;justify-content:center;padding:14px;font-size:0.9rem;">⚡ 执行审图</button>
     </div>
-    <button class="btn btn-sm btn-primary mt-2" id="btnExtractRooms" disabled style="width:100%;">提取房间信息</button>
-    <div id="smartDrawResult" style="margin-top:6px;font-size:0.76rem;"></div>
-  </div>
-  <div class="section">
-    <div class="sec-title" style="font-size:0.8rem;">&#9878; 步骤3：执行审图</div>
-    <button class="btn btn-primary" id="btnSmartReview" disabled style="width:100%;justify-content:center;padding:11px;">&#128300; 开始智能审图</button>
   </div>`;}
 
 function panelSearchHTML(){return `
-  <div class="section">
-    <div class="sec-title"><span class="ic">&#128269;</span>规范检索 · 条文精准查找</div>
-    <div class="sec-desc">在所有已加载的规范 PDF 中全文检索，支持主搜索词 + 子过滤词组合查询。</div>
+  <div class="panel-hd">
+    <span class="ph-title">🔍 规范检索${kbConnected?' <span style="font-size:0.68rem;color:var(--success);">(语义搜索)</span>':' <span style="font-size:0.68rem;color:var(--text-dim);">(精确匹配)</span>'}</span>
+    <span class="panel-close" onclick="hidePanel()" title="收起面板">✕</span>
   </div>
-  <div class="section">
-    <div class="sec-title" style="font-size:0.8rem;">检索条件</div>
-    <label style="font-size:0.73rem;color:var(--text-dim);">主搜索词（必填）</label>
-    <input class="inp" id="searchMain" placeholder="例如：消防疏散" value="">
-    <label style="font-size:0.73rem;color:var(--text-dim);">子过滤词（可选，逗号分隔）</label>
-    <input class="inp" id="searchSub" placeholder="例如：高层公共建筑、疏散门、净宽、距离" value="">
-    <button class="btn btn-primary" id="btnSearch" disabled style="width:100%;justify-content:center;padding:10px;">&#128269; 搜索</button>
-    <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">已加载 <strong id="searchFileCount">0</strong> 个规范文件可供检索</div>
-    <div style="font-size:0.7rem;margin-top:4px;" id="searchKBHint"></div>
-  </div>`;}
-
-function panelScanHTML(){return `
-  <div class="section">
-    <div class="sec-title"><span class="ic">&#9889;</span>一键扫描 · 自动化合规检查</div>
-    <div class="sec-desc">自动扫描所有规范文件，智能识别防火规范，提取消防车道和救援场地要求。可选上传场地总图进行对比。</div>
-  </div>
-  <div class="section">
-    <div class="sec-title" style="font-size:0.8rem;">&#128196; 场地总图（可选）</div>
-    <div class="up-zone" id="scanDrawZone" style="padding:14px 10px;">
-      <div class="up-ic" style="font-size:1.2rem;">&#128506;</div>
-      <div class="up-txt" id="scanDrawTxt">上传场地总图 PDF（可选）</div>
-      <input type="file" id="scanDrawInput" accept=".pdf">
+  <div style="display:flex;gap:14px;align-items:flex-end;">
+    <div style="flex:1;"><label style="font-size:0.73rem;color:var(--text-dim);">主搜索词（必填）</label>
+      <input class="inp" id="searchMain" placeholder="例如：消防疏散" value=""></div>
+    <div style="flex:1.5;"><label style="font-size:0.73rem;color:var(--text-dim);">子过滤词（可选，逗号分隔）</label>
+      <input class="inp" id="searchSub" placeholder="例如：高层公共建筑、疏散门、净宽" value=""></div>
+    <div style="flex:0 0 auto;padding-bottom:6px;">
+      <button class="btn btn-primary" id="btnSearch" disabled style="padding:10px 24px;">🔍 搜索</button>
     </div>
   </div>
-  <div class="section">
-    <button class="btn btn-primary" id="btnScan" disabled style="width:100%;justify-content:center;padding:11px;">&#9889; 开始一键扫描</button>
-    <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">已加载 <strong id="scanFileCount">0</strong> 个规范文件</div>
-    <div style="font-size:0.7rem;margin-top:2px;" id="scanKBHint"></div>
-    <div class="progress-wrap hidden" id="scanProgress"><div class="progress-bar" id="scanBar"></div></div>
-    <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px;" id="scanStatus"></div>
+  <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">已加载 <strong id="searchFileCount">0</strong> 个规范文件可供检索 <span id="searchKBHint"></span></div>`;}
+
+function panelScanHTML(){return `
+  <div class="panel-hd">
+    <span class="ph-title">⚡ 一键扫描 · 自动化合规检查${kbConnected?' <span style="font-size:0.68rem;color:var(--success);">(KB语义驱动)</span>':''}</span>
+    <span class="panel-close" onclick="hidePanel()" title="收起面板">✕</span>
+  </div>
+  <div style="display:flex;gap:14px;align-items:center;">
+    <div style="flex:1;">
+      <div class="sec-title" style="font-size:0.78rem;">场地总图（可选）</div>
+      <div class="up-zone" id="scanDrawZone" style="padding:10px;">
+        <div class="up-txt" id="scanDrawTxt">上传场地总图 PDF（可选）</div>
+        <input type="file" id="scanDrawInput" accept=".pdf">
+      </div>
+    </div>
+    <div style="flex:0 0 auto;">
+      <button class="btn btn-primary" id="btnScan" disabled style="padding:14px 28px;font-size:0.9rem;">⚡ 开始一键扫描</button>
+      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">已加载 <strong id="scanFileCount">0</strong> 个规范</div>
+      <div style="font-size:0.68rem;margin-top:2px;" id="scanKBHint"></div>
+      <div class="progress-wrap hidden mt-2" id="scanProgress"><div class="progress-bar" id="scanBar"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;" id="scanStatus"></div>
+    </div>
   </div>`;}
 
 /* ===================================================================
-   5. MODE: MANAGE (existing v2 logic)
+   5. MODE: MANAGE
    =================================================================== */
 function bindManageEvents(){
   $('regInput').addEventListener('change',onRegFolder);
   $('btnKW').addEventListener('click',extractKW);
   $('btnClearReg').addEventListener('click',clearRegs);
-  const dz=$('drawZone');
-  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
-  dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
-  dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')loadDrawing(f);else toast('请上传PDF文件')});
-  $('drawInput').addEventListener('change',e=>{if(e.target.files[0])loadDrawing(e.target.files[0])});
   $('btnCheck').addEventListener('click',runCheck);
-  // typo dict
   $('typoDict').innerHTML=BUILTIN_TYPOS.map(t=>
     `<span style="color:var(--danger);text-decoration:line-through">${esc(t[0])}</span> → <span style="color:var(--success)">${esc(t[1])}</span>`
   ).join(' &nbsp;|&nbsp; ');
+  if($('manageDrawName'))$('manageDrawName').textContent=drawFileName||'(未上传)';
+  updateCheckBtn();
 }
 
 async function onRegFolder(e){
@@ -463,22 +568,23 @@ async function onRegFolder(e){
 
 function renderRegUI(){
   const list=$('regList'),sum=$('regSum'),zone=$('regZone');
+  if(!list)return;
   if(!regFiles.length){
-    list.innerHTML='';sum.style.display='none';$('btnKW').disabled=true;$('btnClearReg').disabled=true;
-    zone.classList.remove('done');zone.querySelector('.up-txt').textContent='点击选择包含规范 PDF 的文件夹';
+    list.innerHTML='';if(sum)sum.style.display='none';$('btnKW').disabled=true;$('btnClearReg').disabled=true;
+    if(zone){zone.classList.remove('done');zone.querySelector('.up-txt').textContent='点击选择包含规范 PDF 的文件夹';}
     return;
   }
-  list.innerHTML=regFiles.map(f=>`<div class="rf-item"><span style="color:var(--accent)">&#128214;</span><span class="fn">${esc(f.name)}</span><span class="fi">${f.pageCount}页 · ${f.text.length}字</span></div>`).join('');
-  sum.style.display='block';
-  sum.innerHTML='共 <strong>'+regFiles.length+'</strong> 个规范文件'+(regKeywords.length?' · 已提取 <strong>'+regKeywords.length+'</strong> 个关键词':' · 尚未提取关键词');
-  zone.classList.add('done');zone.querySelector('.up-txt').textContent='已加载 '+regFiles.length+' 个规范（可重新选择）';
+  list.innerHTML=regFiles.map(f=>`<div class="rf-item"><span style="color:var(--accent);">📄</span><span class="fn">${esc(f.name)}</span><span class="fi">${f.pageCount}页 · ${f.text.length}字</span></div>`).join('');
+  if(sum){sum.style.display='block';sum.innerHTML='共 <strong>'+regFiles.length+'</strong> 个规范文件'+(regKeywords.length?' · 已提取 <strong>'+regKeywords.length+'</strong> 个关键词':' · 尚未提取关键词');}
+  if(zone){zone.classList.add('done');zone.querySelector('.up-txt').textContent='已加载 '+regFiles.length+' 个规范（可重新选择）';}
   $('btnKW').disabled=false;$('btnClearReg').disabled=false;updateCheckBtn();
 }
 
 function clearRegs(){
   if(!confirm('确定清空所有规范文件和关键词吗？'))return;
   regFiles=[];regKeywords=[];saveRegs();saveKW();renderRegUI();
-  $('kwBox').style.display='none';$('kwBox').innerHTML='';updateCheckBtn();toast('规范库已清空');
+  const box=$('kwBox');if(box){box.style.display='none';box.innerHTML='';}
+  updateCheckBtn();toast('规范库已清空');
 }
 
 function extractKW(){
@@ -500,44 +606,30 @@ function extractKW(){
   const stop=new Set(['应符合下列','应符合国家','应符合本','应符合现行','必须符合','不得小于','不应小于','不宜小于','应大于','必须大于','不得大于','不宜大于','且不应','且不得','且必须','同时应','并且应','以及应','或者应','建筑工程的','建筑工程','应符合','应按照','应严格','应遵照','应执行','的规定','规定执行','规定进行','国家现行','现行国家','现行标准','国家标准','规范规定','本规范','本规定','本标准','下列规定','下列标准','应当符合','应当遵守','应当执行','应当满足','必须满足','必须遵守','按下列','按以下','按照下列','按照以下','以下规定','以上规定','的要求','求进行','进行设计','设计时应','设计必须','设计中应','在设计中','在施工中','施工时应','使用时','采用时','设置时','布置时']);
   const filtered=Object.entries(freq).filter(([g,f])=>f>=2&&!stop.has(g)).sort((a,b)=>b[1]-a[1]);
   regKeywords=filtered.slice(0,200).map(([g])=>g);saveKW();
-  const box=$('kwBox');box.style.display='block';
-  box.innerHTML=`<div class="sec-title" style="font-size:0.78rem;">提取关键词（${regKeywords.length}个）</div>
-    <div style="display:flex;flex-wrap:wrap;gap:3px;max-height:120px;overflow-y:auto;">${regKeywords.slice(0,100).map(k=>`<span style="font-size:0.68rem;padding:2px 6px;border-radius:3px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(201,169,92,0.2);">${esc(k)}</span>`).join('')}${regKeywords.length>100?`<span style="font-size:0.68rem;color:var(--text-dim);padding:2px 6px;">...共${regKeywords.length}个</span>`:''}</div>`;
+  const box=$('kwBox');if(box){box.style.display='block';
+    box.innerHTML=`<div class="sec-title" style="font-size:0.76rem;">提取关键词（${regKeywords.length}个）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px;max-height:100px;overflow-y:auto;">${regKeywords.slice(0,100).map(k=>`<span style="font-size:0.66rem;padding:2px 5px;border-radius:3px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(201,169,92,0.2);">${esc(k)}</span>`).join('')}${regKeywords.length>100?`<span style="font-size:0.66rem;color:var(--text-dim);padding:2px 5px;">...共${regKeywords.length}个</span>`:''}</div>`;}
   renderRegUI();toast('已提取 '+regKeywords.length+' 个关键词');
-}
-
-async function loadDrawing(file){
-  drawFileName=file.name;drawPages=[];drawPDF=null;
-  $('drawTxt').textContent='正在解析图纸...';$('drawZone').classList.add('done');
-  try{
-    const buf=await file.arrayBuffer();
-    const pdf=await pdfjsLib.getDocument({data:buf}).promise;drawPDF=pdf;
-    for(let i=1;i<=pdf.numPages;i++){
-      const pg=await pdf.getPage(i);const c=await pg.getTextContent();
-      drawPages.push({pageNum:i,text:c.items.map(it=>it.str).join(''),items:c.items,viewport:pg.getViewport({scale:1})});
-    }
-    $('drawInfo').style.display='block';
-    $('drawInfo').innerHTML='已加载：<strong>'+esc(file.name)+'</strong> · '+pdf.numPages+'页 · 约'+drawPages.reduce((s,p)=>s+p.text.length,0)+'字符';
-    $('drawTxt').textContent='图纸已就绪';updateCheckBtn();
-    await renderPDF(drawPDF,drawPages);toast('图纸解析完成，共'+pdf.numPages+'页');
-  }catch(e){$('drawTxt').textContent='解析失败，请重试';$('drawZone').classList.remove('done');toast('解析失败：'+e.message)}
 }
 
 function updateCheckBtn(){$('btnCheck').disabled=!(drawPages.length&&regKeywords.length);}
 
 /* ===================================================================
-   6. PDF RENDERING (shared)
+   6. PDF RENDERING
    =================================================================== */
 async function renderPDF(pdfDoc,pagesArr){
   const viewer=$('pdfViewer'),empty=$('pdfEmpty'),pages=$('pdfPages');
   if(!pdfDoc||!pagesArr.length){empty.classList.remove('hidden');pages.innerHTML='';return}
   empty.classList.add('hidden');pages.innerHTML='';
-  const cw=Math.max(viewer.clientWidth-32,300);
+  const cw=Math.max(viewer.clientWidth-32,400);
   for(const dp of pagesArr){
     const scale=cw/dp.viewport.width,w=Math.floor(dp.viewport.width*scale),h=Math.floor(dp.viewport.height*scale);
     const wrap=document.createElement('div');wrap.className='pdf-pwrap';wrap.id='pw'+dp.pageNum;
     wrap.style.width=w+'px';wrap.style.height=h+'px';
     const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.style.width=w+'px';cv.style.height=h+'px';cv.id='pc'+dp.pageNum;wrap.appendChild(cv);
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('class','svg-overlay');svg.setAttribute('id','svgo'+dp.pageNum);
+    svg.setAttribute('width',w);svg.setAttribute('height',h);wrap.appendChild(svg);
     const hl=document.createElement('div');hl.className='hl-layer';hl.id='hl'+dp.pageNum;wrap.appendChild(hl);
     pages.appendChild(wrap);
     const pg=await pdfDoc.getPage(dp.pageNum);
@@ -548,28 +640,39 @@ async function renderPDF(pdfDoc,pagesArr){
 /* ===================================================================
    7. MODE: MANAGE CHECK & RESULTS
    =================================================================== */
-function runCheck(){
+async function runCheck(){
   if(!drawPages.length){toast('请先上传图纸');return}
   if(!regKeywords.length){toast('请先上传规范文件并提取关键词');return}
   checkIssues=[];checkTypos=[];checkUnits=[];
   const fullText=drawPages.map(p=>p.text).join('');
   const pageMap=[];let offset=0;
   for(const dp of drawPages){pageMap.push({pageNum:dp.pageNum,start:offset,end:offset+dp.text.length});offset+=dp.text.length+1;}
+
+  // Keyword-based check (existing logic)
   for(const kw of regKeywords){
     if(!fullText.includes(kw)){
       const srcRegs=regFiles.filter(f=>f.text.includes(kw)).map(f=>f.name.replace(/\.pdf$/i,''));
       checkIssues.push({keyword:kw,sources:srcRegs.length?srcRegs:['(规范库)']});
     }
   }
-  for(const [wrong,correct] of BUILTIN_TYPOS){
-    let idx=0;
-    while(idx<fullText.length){
-      const pos=fullText.indexOf(wrong,idx);if(pos===-1)break;
-      const pgInfo=findPage(pos,pageMap);const ctx=getContext(fullText,pos,wrong.length);
-      checkTypos.push({wrong,correct,pageNum:pgInfo?pgInfo.pageNum:1,context:ctx});
-      idx=pos+1;
+
+  // Semantic typo detection via KB (replaces simple keyword matching)
+  if(kbConnected){
+    await runSemanticTypoCheck(fullText,pageMap);
+  } else {
+    // Fallback to BUILTIN_TYPOS matching
+    for(const [wrong,correct] of BUILTIN_TYPOS){
+      let idx=0;
+      while(idx<fullText.length){
+        const pos=fullText.indexOf(wrong,idx);if(pos===-1)break;
+        const pgInfo=findPage(pos,pageMap);const ctx=getContext(fullText,pos,wrong.length);
+        checkTypos.push({wrong,correct,pageNum:pgInfo?pgInfo.pageNum:1,context:ctx,semantic:false});
+        idx=pos+1;
+      }
     }
   }
+
+  // Unit spacing check
   const uRe=/(\d+(?:\.\d+)?)\s*(m²|m³|m{1,2}|cm|mm|km|kg|kN|MPa|℃|°)(?![a-zA-Z一-鿿])/g;
   let m;
   while((m=uRe.exec(fullText))!==null){
@@ -583,11 +686,76 @@ function runCheck(){
   toast('核对完成 · '+checkIssues.length+'个不合理项 · '+(checkTypos.length+checkUnits.length)+'个文本错误');
 }
 
+async function runSemanticTypoCheck(fullText,pageMap){
+  // Extract sentences from drawing that look like normative statements
+  const sentences=fullText.split(/[。！？；\n]+/).filter(s=>s.length>8&&s.length<200);
+  const checkedPairs=new Set();
+  for(const sent of sentences.slice(0,30)){ // Limit to 30 sentences for performance
+    try{
+      const kbRes=await kbSearch(sent.substring(0,80),2);
+      if(!kbRes.results||!kbRes.results.length)continue;
+      const best=kbRes.results[0];
+      if(best.score<0.5)continue; // Not similar enough
+      // Compare drawing text with KB regulation text
+      const kbText=best.content||'';
+      const drawClean=sent.replace(/\s+/g,'');
+      const kbClean=kbText.replace(/\s+/g,'');
+      // Find differing character sequences
+      const diff=findCharDiffs(drawClean,kbClean);
+      for(const d of diff){
+        if(d.drawStr.length>=2&&d.drawStr.length<=6&&/^[一-鿿]+$/.test(d.drawStr)){
+          const pairKey=d.drawStr+'|'+d.kbStr;
+          if(checkedPairs.has(pairKey))continue;
+          checkedPairs.add(pairKey);
+          const pos=fullText.indexOf(d.drawStr);
+          if(pos===-1)continue;
+          const pgInfo=findPage(pos,pageMap);
+          checkTypos.push({
+            wrong:d.drawStr,correct:d.kbStr,
+            pageNum:pgInfo?pgInfo.pageNum:1,
+            context:getContext(fullText,pos,d.drawStr.length),
+            semantic:true,kbSource:best.source||''
+          });
+        }
+      }
+    }catch(e){/* skip this sentence */}
+  }
+  // Also run BUILTIN_TYPOS for any that semantic missed
+  const semanticWrongs=new Set(checkTypos.map(t=>t.wrong));
+  for(const [wrong,correct] of BUILTIN_TYPOS){
+    if(semanticWrongs.has(wrong))continue;
+    let idx=0;
+    while(idx<fullText.length){
+      const pos=fullText.indexOf(wrong,idx);if(pos===-1)break;
+      const pgInfo=findPage(pos,pageMap);
+      checkTypos.push({wrong,correct,pageNum:pgInfo?pgInfo.pageNum:1,context:getContext(fullText,pos,wrong.length),semantic:false});
+      idx=pos+1;
+    }
+  }
+}
+
+function findCharDiffs(s1,s2){
+  // Simple character-level diff: find substrings in s1 that differ from s2
+  const diffs=[];
+  const maxLen=Math.min(s1.length,s2.length);
+  let i=0;
+  while(i<maxLen){
+    if(s1[i]!==s2[i]){
+      let j=i;
+      while(j<maxLen&&s1[j]!==s2[j])j++;
+      const len=Math.min(j-i,6);
+      diffs.push({drawStr:s1.substring(i,i+len),kbStr:s2.substring(i,i+len)});
+      i=j;
+    }else{i++;}
+  }
+  return diffs.slice(0,5);
+}
+
 function findPage(pos,pageMap){for(const pm of pageMap){if(pos>=pm.start&&pos<pm.end)return pm;}for(const pm of pageMap){if(pos<pm.start)return pm;}return pageMap[pageMap.length-1];}
 function getContext(text,pos,len){const s=Math.max(0,pos-12),e=Math.min(text.length,pos+len+12);return (s>0?'…':'')+text.slice(s,e)+(e<text.length?'…':'');}
 
 /* ===================================================================
-   8. RESULT DISPLAY (shared)
+   8. RESULT DISPLAY
    =================================================================== */
 function showResBar(mode){
   $('resBar').classList.remove('hidden');
@@ -596,11 +764,11 @@ function showResBar(mode){
     <button class="tab active" id="tabIss" onclick="switchResTab('issues')">不合理项<span class="badge" id="badgeIss">0</span></button>
     <button class="tab" id="tabTyp" onclick="switchResTab('typos')">文本错误<span class="badge" id="badgeTyp">0</span></button>
     <div style="flex:1;"></div>
-    <button class="btn btn-sm" onclick="toggleResBar()" id="btnToggleRes">折叠 &#9650;</button>`;}
+    <button class="btn btn-sm" onclick="toggleResBar()" id="btnToggleRes">折叠 ▲</button>`;}
   else{$('resHd').innerHTML=`
     <span style="font-weight:600;font-size:0.82rem;color:var(--text-bright);">分析结果</span>
     <div style="flex:1;"></div>
-    <button class="btn btn-sm" onclick="$('resBar').classList.add('hidden')">关闭 &#10005;</button>`;}
+    <button class="btn btn-sm" onclick="$('resBar').classList.add('hidden')">关闭 ✕</button>`;}
 }
 
 function switchResTab(tab){
@@ -612,8 +780,8 @@ function switchResTab(tab){
 
 function toggleResBar(){
   const bar=$('resBar');const btn=$('btnToggleRes');
-  if(bar.style.maxHeight==='40px'){bar.style.maxHeight='44%';btn.innerHTML='折叠 &#9650;'}
-  else{bar.style.maxHeight='40px';btn.innerHTML='展开 &#9660;'}
+  if(bar.style.maxHeight==='40px'){bar.style.maxHeight='46%';btn.innerHTML='折叠 ▲';}
+  else{bar.style.maxHeight='40px';btn.innerHTML='展开 ▼';}
 }
 
 function renderManageResults(){
@@ -631,21 +799,22 @@ function renderManageResults(){
 
 function renderIssues(){
   const list=$('resList');
-  if(checkIssues.length===0){list.innerHTML='<div class="empty" style="padding:20px;"><div style="font-size:1.5rem;opacity:0.3;">&#10003;</div><div>所有关键词均已在图纸中找到</div></div>';return;}
+  if(checkIssues.length===0){list.innerHTML='<div class="empty" style="padding:20px;"><div style="font-size:1.5rem;opacity:0.3;">✓</div><div>所有关键词均已在图纸中找到</div></div>';return;}
   list.innerHTML=checkIssues.map((iss,i)=>`
     <div class="iss" data-idx="${i}" onclick="jumpToIssue(${i})">
       <div class="is">缺失关键词 <span class="ikw">${esc(iss.keyword)}</span></div>
       <div class="im">来源规范：${iss.sources.map(s=>esc(s)).join('、')}</div>
-      <div class="ip">&#128206; 点击在图纸中查找相关位置</div>
+      <div class="ip" style="font-size:0.7rem;color:var(--info);margin-top:2px;">📌 点击在图纸中查找相关位置</div>
     </div>`).join('');
 }
 
 function renderTypos(){
-  const all=[...checkTypos,...checkUnits.map(u=>({wrong:u.wrong,correct:u.correct,pageNum:u.pageNum,context:u.context,isUnit:true}))];
-  if(all.length===0){$('resList').innerHTML='<div class="empty" style="padding:20px;"><div style="font-size:1.5rem;opacity:0.3;">&#10003;</div><div>未发现文本错误</div></div>';return;}
+  const all=[...checkTypos,...checkUnits.map(u=>({wrong:u.wrong,correct:u.correct,pageNum:u.pageNum,context:u.context,isUnit:true,semantic:u.semantic||false}))];
+  if(all.length===0){$('resList').innerHTML='<div class="empty" style="padding:20px;"><div style="font-size:1.5rem;opacity:0.3;">✓</div><div>未发现文本错误</div></div>';return;}
   $('resList').innerHTML=all.map((t,i)=>`
-    <div class="tyi" onclick="jumpToTypo(${i})">
+    <div class="tyi" onclick="jumpToTypo(${i})" style="border-left-color:${t.semantic?'var(--info)':'var(--accent)'};">
       <span class="tw">${esc(t.wrong)}</span><span class="ta">→</span><span class="tc">${esc(t.correct)}</span>
+      ${t.semantic?`<span style="font-size:0.64rem;padding:1px 4px;border-radius:3px;background:var(--info);color:#fff;opacity:0.7;flex-shrink:0;">语义</span>`:''}
       <span class="tp" title="${esc(t.context)}">p.${t.pageNum} ${esc(t.context)}</span>
     </div>`).join('');
 }
@@ -680,10 +849,7 @@ function highlightInPDF(pageNum,text){
   const scale=parseFloat(wrap.style.width)/dp.viewport.width;
   for(const item of dp.items){
     if(item.str.includes(text)||text.includes(item.str)){
-      const tx=item.transform;
-      const x=tx[4]*scale;
-      const y=(dp.viewport.height-tx[5])*scale-item.height*scale;
-      const w=item.width*scale+2,h=item.height*scale+2;
+      const tx=item.transform,x=tx[4]*scale,y=(dp.viewport.height-tx[5])*scale-item.height*scale,w=item.width*scale+2,h=item.height*scale+2;
       const rect=document.createElement('div');rect.className='hl-rect';
       rect.style.left=x+'px';rect.style.top=y+'px';rect.style.width=w+'px';rect.style.height=h+'px';
       hlLayer.appendChild(rect);
@@ -693,48 +859,66 @@ function highlightInPDF(pageNum,text){
 }
 
 /* ===================================================================
-   9. MODE: SMART REVIEW (智能审图)
+   8b. PDF RED-BOX ANNOTATION (for structured error navigation)
    =================================================================== */
-let smartReqs=[]; // [{roomType, minArea, sourceReg, fullText}]
-let smartRooms=[]; // [{roomName, area, pageNum}]
+function highlightErrorRegion(pageNum,x,y,w,h){
+  clearAllErrorHighlights();
+  const wrap=$('pw'+pageNum);if(!wrap)return;
+  const svgOverlay=wrap.querySelector('.svg-overlay');if(!svgOverlay)return;
+  const scale=parseFloat(wrap.style.width)/drawPages[pageNum-1].viewport.width;
+  const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  rect.setAttribute('x',(x*scale-2).toString());
+  rect.setAttribute('y',((drawPages[pageNum-1].viewport.height-y-h)*scale-2).toString());
+  rect.setAttribute('width',(w*scale+4).toString());
+  rect.setAttribute('height',(h*scale+4).toString());
+  rect.setAttribute('class','error-rect');
+  svgOverlay.appendChild(rect);
+  wrap.classList.add('err-highlight');
+}
 
+function navigateToError(pageNum,x,y,w,h){
+  const wrap=$('pw'+pageNum);if(!wrap)return;
+  clearAllErrorHighlights();
+  highlightErrorRegion(pageNum,x,y,w,h);
+  wrap.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>{wrap.classList.remove('err-highlight');},5000);
+}
+
+function clearAllErrorHighlights(){
+  document.querySelectorAll('.svg-overlay').forEach(s=>s.innerHTML='');
+  document.querySelectorAll('.pdf-pwrap.err-highlight').forEach(w=>w.classList.remove('err-highlight'));
+}
+
+/* ===================================================================
+   9. MODE: SMART REVIEW
+   =================================================================== */
 function bindSmartEvents(){
-  // Update select dropdown
   updateSmartSelect();
   $('smartRegSelect').addEventListener('change',e=>{
-    if(e.target.value){
-      const f=regFiles.find(r=>r.name===e.target.value);
-      smartRegText=f?f.text:'';
-      $('smartRegTxt').textContent='已选择：'+esc(e.target.value);
-      $('smartRegZone').classList.add('done');
-    }else{smartRegText='';$('smartRegTxt').textContent='或直接上传规范 PDF';$('smartRegZone').classList.remove('done');}
+    if(e.target.value){const f=regFiles.find(r=>r.name===e.target.value);smartRegText=f?f.text:'';$('smartRegTxt').textContent='已选择：'+esc(e.target.value);$('smartRegZone').classList.add('done');}
+    else{smartRegText='';$('smartRegTxt').textContent='或直接上传规范 PDF';$('smartRegZone').classList.remove('done');}
     updateSmartBtn();
   });
-  // Smart reg upload
   $('smartRegInput').addEventListener('change',async e=>{
     const f=e.target.files[0];if(!f)return;
-    try{
-      const buf=await f.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    try{const buf=await f.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;
       let txt='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const c=await pg.getTextContent();txt+=c.items.map(it=>it.str).join('')+'\n';}
-      smartRegText=txt;$('smartRegTxt').textContent='已加载：'+esc(f.name);$('smartRegZone').classList.add('done');
-      toast('规范解析完成');
-    }catch(e){toast('解析失败')}
+      smartRegText=txt;$('smartRegTxt').textContent='已加载：'+esc(f.name);$('smartRegZone').classList.add('done');toast('规范解析完成');}
+    catch(e){toast('解析失败')}
     updateSmartBtn();
   });
-  // Smart draw upload
   const sdz=$('smartDrawZone');
   sdz.addEventListener('dragover',e=>{e.preventDefault();sdz.classList.add('drag')});
   sdz.addEventListener('dragleave',()=>sdz.classList.remove('drag'));
   sdz.addEventListener('drop',e=>{e.preventDefault();sdz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')loadSmartDraw(f);else toast('请上传PDF文件')});
   $('smartDrawInput').addEventListener('change',e=>{if(e.target.files[0])loadSmartDraw(e.target.files[0])});
-  // Buttons
   $('btnExtractReqs').addEventListener('click',extractAreaReqs);
   $('btnExtractRooms').addEventListener('click',extractRooms);
   $('btnSmartReview').addEventListener('click',runSmartReview);
 }
 
 function updateSmartSelect(){
-  const sel=$('smartRegSelect');
+  const sel=$('smartRegSelect');if(!sel)return;
   sel.innerHTML='<option value="">-- 从规范库中选择（或下方上传） --</option>'+regFiles.map(f=>`<option value="${esc(f.name)}">${esc(f.name.replace(/\.pdf$/i,''))}</option>`).join('');
 }
 
@@ -749,25 +933,16 @@ async function loadSmartDraw(file){
       smartDrawPages.push({pageNum:i,text:c.items.map(it=>it.str).join(''),items:c.items,viewport:pg.getViewport({scale:1})});
     }
     $('smartDrawTxt').textContent='图纸已就绪：'+esc(file.name)+' · '+pdf.numPages+'页';
-    toast('图纸解析完成');
-    await renderPDF(smartDrawPDF,smartDrawPages);
+    await renderPDF(smartDrawPDF,smartDrawPages);toast('图纸解析完成');
   }catch(e){$('smartDrawTxt').textContent='解析失败';$('smartDrawZone').classList.remove('done');toast('解析失败')}
   updateSmartBtn();
 }
 
 function updateSmartBtn(){
-  $('btnExtractReqs').disabled=!smartRegText;
-  $('btnExtractRooms').disabled=!smartDrawPages.length;
-  $('btnSmartReview').disabled=!(smartReqs.length&&smartRooms.length);
+  if($('btnExtractReqs'))$('btnExtractReqs').disabled=!smartRegText;
+  if($('btnExtractRooms'))$('btnExtractRooms').disabled=!smartDrawPages.length;
+  if($('btnSmartReview'))$('btnSmartReview').disabled=!(smartReqs.length&&smartRooms.length);
 }
-
-// Room type display names
-const ROOM_TYPES={
-  '卧室':'卧室','双人卧室':'双人卧室','单人卧室':'单人卧室','兼起居的卧室':'兼起居的卧室',
-  '兼起居室':'兼起居室','起居室':'起居室（客厅）','客厅':'起居室（客厅）','厨房':'厨房',
-  '卫生间':'卫生间','厕所':'卫生间','阳台':'阳台','书房':'书房','餐厅':'餐厅',
-  '储藏室':'储藏室','门厅':'门厅','走道':'走道','过道':'过道'
-};
 
 function extractAreaReqs(){
   if(!smartRegText){toast('请先加载规范');return}
@@ -792,26 +967,17 @@ function extractAreaReqs(){
   for(const{re,type} of patterns){
     let m;while((m=re.exec(smartRegText))!==null){
       const key=type+'|'+m[1];
-      if(!seen.has(key)){
-        seen.add(key);
-        const ctx=getContext(smartRegText,m.index,m[0].length);
-        smartReqs.push({roomType:type,minArea:parseFloat(m[1]),fullText:m[0],context:ctx});
-      }
+      if(!seen.has(key)){seen.add(key);const ctx=getContext(smartRegText,m.index,m[0].length);smartReqs.push({roomType:type,minArea:parseFloat(m[1]),fullText:m[0],context:ctx});}
     }
   }
-  // Also search with "不小于" as general fallback
   const gr=/(卧室|起居室|客厅|厨房|卫生间|厕所|阳台|书房|餐厅|储藏室|门厅|走道|过道).*?(?:面积).*?(?:不小于|不应小于|不宜小于|≥)\s*(\d+\.?\d*)\s*(?:[mM㎡²]|平米)?/g;
   let m2;while((m2=gr.exec(smartRegText))!==null){
     const key=m2[1]+'|'+m2[2];
-    if(!seen.has(key)){
-      seen.add(key);
-      const ctx=getContext(smartRegText,m2.index,m2[0].length);
-      smartReqs.push({roomType:m2[1],minArea:parseFloat(m2[2]),fullText:m2[0],context:ctx});
-    }
+    if(!seen.has(key)){seen.add(key);const ctx=getContext(smartRegText,m2.index,m2[0].length);smartReqs.push({roomType:m2[1],minArea:parseFloat(m2[2]),fullText:m2[0],context:ctx});}
   }
-  if(!smartReqs.length){$('smartRegResult').innerHTML='<span style="color:var(--danger);">未找到面积要求条文，请确认规范内容包含房间面积规定。</span>';updateSmartBtn();return;}
-  $('smartRegResult').innerHTML=`<div style="color:var(--success);font-weight:600;">&#10003; 已提取 ${smartReqs.length} 条面积要求：</div>`+
-    smartReqs.map(r=>`<div style="margin-top:3px;font-size:0.72rem;padding:4px 8px;background:var(--surface);border-radius:var(--radius);"><span class="hl-text">${esc(r.roomType)}</span> ≥ <strong>${r.minArea}㎡</strong> <span style="color:var(--text-dim);">${esc(r.context)}</span></div>`).join('');
+  if(!smartReqs.length){$('smartRegResult').innerHTML='<span style="color:var(--danger);">未找到面积要求条文。</span>';updateSmartBtn();return;}
+  $('smartRegResult').innerHTML=`<div style="color:var(--success);font-weight:600;">✓ 已提取 ${smartReqs.length} 条面积要求：</div>`+
+    smartReqs.map(r=>`<div style="margin-top:2px;font-size:0.7rem;padding:3px 6px;background:var(--surface);border-radius:var(--radius);"><span class="hl-text">${esc(r.roomType)}</span> ≥ <strong>${r.minArea}㎡</strong></div>`).join('');
   updateSmartBtn();toast('已提取 '+smartReqs.length+' 条面积要求');
 }
 
@@ -819,49 +985,35 @@ function extractRooms(){
   if(!smartDrawPages.length){toast('请先上传图纸');return}
   smartRooms=[];
   const fullText=smartDrawPages.map(p=>p.text).join('\n');
-  // Build page map
   const pageMap=[];let offset=0;
   for(const dp of smartDrawPages){pageMap.push({pageNum:dp.pageNum,start:offset,end:offset+dp.text.length});offset+=dp.text.length+1;}
-  // Room names
   const roomNames='主卧|次卧|客卧|儿童房|老人房|工人房|卧室|双人卧室|单人卧室|兼起居的卧室|起居室|客厅|厨房|卫生间|厕所|阳台|书房|餐厅|储藏室|储物间|门厅|玄关|走道|过道|多功能室|活动室|办公室|会议室|接待室|衣帽间|洗衣房|设备间|机房|配电间|水泵房';
-  // Pattern: room name followed by area number (within same line)
   const roomRe=new RegExp('('+roomNames+').*?(\\d+\\.?\\d*)\\s*(?:[mM㎡²]|平米|平方)', 'g');
   let m;
   while((m=roomRe.exec(fullText))!==null){
     const pgInfo=findPage(m.index,pageMap);
     smartRooms.push({roomName:m[1],area:parseFloat(m[2]),pageNum:pgInfo?pgInfo.pageNum:1});
   }
-  // Also try to find area numbers near room names using spatial proximity in PDF items
   const areaNearRe=/(\d+\.?\d*)\s*(?:[mM㎡²]|平米)/g;
   for(const dp of smartDrawPages){
-    // Get items sorted by y then x (approximating reading order)
-    const items=[...dp.items].sort((a,b)=>{
-      const ya=a.transform[5],yb=b.transform[5];
-      if(Math.abs(ya-yb)>10)return yb-ya;
-      return a.transform[4]-b.transform[4];
-    });
+    const items=[...dp.items].sort((a,b)=>{const ya=a.transform[5],yb=b.transform[5];if(Math.abs(ya-yb)>10)return yb-ya;return a.transform[4]-b.transform[4];});
     const textLine=items.map(it=>it.str).join('');
     let am;while((am=areaNearRe.exec(textLine))!==null){
       const areaVal=parseFloat(am[1]);
-      // Check if already captured
       const exists=smartRooms.some(r=>Math.abs(r.area-areaVal)<0.01&&r.pageNum===dp.pageNum);
       if(!exists){
-        // Look backward for room name
         const pre=textLine.slice(Math.max(0,am.index-30),am.index);
         const rnMatch=pre.match(new RegExp('('+roomNames+')'));
-        if(rnMatch){
-          smartRooms.push({roomName:rnMatch[1],area:areaVal,pageNum:dp.pageNum});
-        }
+        if(rnMatch)smartRooms.push({roomName:rnMatch[1],area:areaVal,pageNum:dp.pageNum});
       }
     }
   }
-  // Deduplicate
   const seenR=new Set();
   smartRooms=smartRooms.filter(r=>{const k=r.roomName+'|'+r.area+'|'+r.pageNum;if(seenR.has(k))return false;seenR.add(k);return true;});
-  if(!smartRooms.length){$('smartDrawResult').innerHTML='<span style="color:var(--danger);">未检测到房间面积标注。请确认图纸包含房间名称和面积数据。</span>';updateSmartBtn();return;}
-  $('smartDrawResult').innerHTML=`<div style="color:var(--success);font-weight:600;">&#10003; 已识别 ${smartRooms.length} 个房间：</div>`+
-    smartRooms.slice(0,20).map(r=>`<span style="display:inline-block;margin:2px 4px;padding:2px 7px;border-radius:100px;font-size:0.7rem;background:var(--surface);border:1px solid var(--border);">${esc(r.roomName)} <strong>${r.area}㎡</strong></span>`).join('')+
-    (smartRooms.length>20?`<span style="font-size:0.7rem;color:var(--text-dim);">...共${smartRooms.length}个</span>`:'');
+  if(!smartRooms.length){$('smartDrawResult').innerHTML='<span style="color:var(--danger);">未检测到房间面积标注。</span>';updateSmartBtn();return;}
+  $('smartDrawResult').innerHTML=`<div style="color:var(--success);font-weight:600;">✓ 已识别 ${smartRooms.length} 个房间</div>`+
+    smartRooms.slice(0,15).map(r=>`<span style="display:inline-block;margin:2px 3px;padding:2px 6px;border-radius:100px;font-size:0.68rem;background:var(--surface);border:1px solid var(--border);">${esc(r.roomName)} <strong>${r.area}㎡</strong></span>`).join('')+
+    (smartRooms.length>15?`<span style="font-size:0.68rem;color:var(--text-dim);">...共${smartRooms.length}个</span>`:'');
   updateSmartBtn();toast('已识别 '+smartRooms.length+' 个房间');
 }
 
@@ -870,9 +1022,7 @@ async function runSmartReview(){
   const results=[];
   for(const room of smartRooms){
     let matchedReq=null;
-    for(const req of smartReqs){
-      if(room.roomName.includes(req.roomType)||req.roomType.includes(room.roomName)){matchedReq=req;break;}
-    }
+    for(const req of smartReqs){if(room.roomName.includes(req.roomType)||req.roomType.includes(room.roomName)){matchedReq=req;break;}}
     if(!matchedReq){
       if(/卧室/.test(room.roomName)) matchedReq=smartReqs.find(r=>r.roomType==='卧室');
       else if(/起居|客厅/.test(room.roomName)) matchedReq=smartReqs.find(r=>r.roomType==='起居室'||r.roomType==='客厅');
@@ -883,10 +1033,8 @@ async function runSmartReview(){
     results.push({...room,reqType:matchedReq?matchedReq.roomType:'(未找到对应规范)',minArea:matchedReq?matchedReq.minArea:null,pass,reqText:matchedReq?matchedReq.fullText:'',kbClause:'',kbSource:'',suggestion:''});
   }
 
-  // KB enrichment — fetch exact regulation clauses for each room
   if(kbConnected){
-    $('btnSmartReview').disabled=true;
-    $('btnSmartReview').textContent='正在查询知识库...';
+    $('btnSmartReview').disabled=true;$('btnSmartReview').textContent='查询知识库中...';
     for(const r of results){
       if(!r.reqType||r.reqType==='(未找到对应规范)')continue;
       try{
@@ -894,41 +1042,27 @@ async function runSmartReview(){
         const kbRes=await kbSearch(query,3);
         if(kbRes.results&&kbRes.results.length>0){
           const best=kbRes.results[0];
-          r.kbClause=best.content||'';
-          r.kbSource=best.source||'';
-          if(r.pass===false){
-            r.suggestion='建议将'+r.roomName+'面积从'+r.area+'㎡调整至≥'+r.minArea+'㎡，以满足'+r.kbSource+'中"'+r.reqType+'使用面积不应小于'+r.minArea+'㎡"的要求。';
-          }else if(r.pass===true){
-            r.suggestion='当前面积'+r.area+'㎡满足规范≥'+r.minArea+'㎡的要求。';
-          }
+          r.kbClause=best.content||'';r.kbSource=best.source||'';
+          if(r.pass===false)r.suggestion='建议将'+r.roomName+'面积从'+r.area+'㎡调整至≥'+r.minArea+'㎡，以满足'+r.kbSource+'中规定。';
+          else if(r.pass===true)r.suggestion='当前面积'+r.area+'㎡满足规范≥'+r.minArea+'㎡的要求。';
         }
-      }catch(e){/* KB query failed for this room, leave empty */}
+      }catch(e){}
     }
-    $('btnSmartReview').textContent='开始智能审图';
-    $('btnSmartReview').disabled=false;
+    $('btnSmartReview').textContent='⚡ 执行审图';$('btnSmartReview').disabled=false;
   }
 
-  // Generate suggestions for rooms where KB didn't provide one
   for(const r of results){
     if(!r.suggestion){
-      if(r.pass===false){
-        r.suggestion='建议将'+r.roomName+'面积从'+r.area+'㎡调整至≥'+r.minArea+'㎡。';
-      }else if(r.pass===true){
-        r.suggestion='符合规范要求。';
-      }else{
-        r.suggestion='知识库中未找到该房间类型的明确面积要求，建议查阅相关建筑设计规范。';
-      }
+      if(r.pass===false)r.suggestion='建议将'+r.roomName+'面积从'+r.area+'㎡调整至≥'+r.minArea+'㎡。';
+      else if(r.pass===true)r.suggestion='符合规范要求。';
+      else r.suggestion='知识库中未找到该房间类型的明确面积要求，建议查阅相关建筑设计规范。';
     }
   }
 
-  // Display results
   showResBar('smart');
-  const failCount=results.filter(r=>r.pass===false).length;
-  const passCount=results.filter(r=>r.pass===true).length;
-  const unknownCount=results.filter(r=>r.pass===null).length;
+  const failCount=results.filter(r=>r.pass===false).length,passCount=results.filter(r=>r.pass===true).length,unknownCount=results.filter(r=>r.pass===null).length;
   let sum='<div class="sum-row">';
-  sum+='<div class="chip info">图纸：'+esc(smartDrawName)+'</div>';
-  sum+='<div class="chip info">规范要求：'+smartReqs.length+'条</div>';
+  sum+='<div class="chip info">图纸：'+esc(smartDrawName)+'</div><div class="chip info">规范要求：'+smartReqs.length+'条</div>';
   if(kbConnected)sum+='<div class="chip ok">KB知识库：已关联</div>';
   if(failCount)sum+='<div class="chip warn">不合规：'+failCount+'间</div>';
   if(passCount)sum+='<div class="chip ok">合规：'+passCount+'间</div>';
@@ -938,28 +1072,20 @@ async function runSmartReview(){
   const showKB=kbConnected&&results.some(r=>r.kbClause);
   $('resList').innerHTML=`
     <table class="res-table">
-      <thead><tr>
-        <th>房间名称</th><th>图纸面积</th><th>规范要求</th><th>状态</th>
-        ${showKB?'<th>规范条文原文</th><th>修改建议</th>':''}
-      </tr></thead>
+      <thead><tr><th>房间名称</th><th>图纸面积</th><th>规范要求</th><th>状态</th>${showKB?'<th>规范条文原文</th><th>修改建议</th>':''}</tr></thead>
       <tbody>${results.map(r=>`
         <tr>
-          <td>${esc(r.roomName)}</td>
-          <td>${r.area}㎡</td>
-          <td>${r.minArea!==null?r.minArea+'㎡ ('+esc(r.reqType)+')':'—'}</td>
-          <td class="${r.pass===true?'td-pass':r.pass===false?'td-fail':''}">${r.pass===true?'&#10003; 合规':r.pass===false?'&#10007; 面积不足':'未匹配规范'}</td>
-          ${showKB?`
-            <td class="td-clause">${r.kbClause?esc(r.kbClause.substring(0,200))+(r.kbClause.length>200?'...':'')+'<div style="font-size:0.66rem;color:var(--accent);margin-top:2px;">— '+esc(r.kbSource)+'</div>':'<span style="color:var(--text-dim);">—</span>'}</td>
-            <td style="max-width:280px;font-size:0.74rem;line-height:1.4;">${esc(r.suggestion)}</td>
-          `:''}
-        </tr>`).join('')}</tbody>
-    </table>`;
+          <td>${esc(r.roomName)}</td><td>${r.area}㎡</td><td>${r.minArea!==null?r.minArea+'㎡ ('+esc(r.reqType)+')':'—'}</td>
+          <td class="${r.pass===true?'td-pass':r.pass===false?'td-fail':''}">${r.pass===true?'✓ 合规':r.pass===false?'✗ 面积不足':'未匹配规范'}</td>
+          ${showKB?`<td class="td-clause">${r.kbClause?esc(r.kbClause.substring(0,200))+(r.kbClause.length>200?'...':'')+'<div style="font-size:0.66rem;color:var(--accent);margin-top:2px;">— '+esc(r.kbSource)+'</div>':'<span style="color:var(--text-dim);">—</span>'}</td>
+          <td style="max-width:280px;font-size:0.74rem;line-height:1.4;">${esc(r.suggestion)}</td>`:''}
+        </tr>`).join('')}</tbody></table>`;
   if(failCount)toast('发现 '+failCount+' 个房间面积不足'+(kbConnected?'，已关联规范条文':''));
   else toast('审图完成，所有匹配房间均合规');
 }
 
 /* ===================================================================
-   10. MODE: REGULATION SEARCH (规范检索)
+   10. MODE: REGULATION SEARCH
    =================================================================== */
 function bindSearchEvents(){
   $('searchFileCount').textContent=regFiles.length;
@@ -968,8 +1094,8 @@ function bindSearchEvents(){
   $('searchMain').addEventListener('input',()=>{$('btnSearch').disabled=!($('searchMain').value.trim()&&regFiles.length);});
   const hint=$('searchKBHint');
   if(hint)hint.innerHTML=kbConnected
-    ?'<span style="color:var(--success);">&#10003; 知识库已连接，将使用语义搜索</span>'
-    :'<span style="color:var(--text-dim);">知识库离线，使用精确匹配搜索</span>';
+    ?' · <span style="color:var(--success);">KB语义搜索已启用</span>'
+    :' · <span style="color:var(--text-dim);">使用精确匹配搜索</span>';
 }
 
 function runSearch(){
@@ -978,12 +1104,8 @@ function runSearch(){
   if(!regFiles.length){toast('请先在"规范管理"中加载规范文件');return}
   const subRaw=$('searchSub').value.trim();
   const subTerms=subRaw?subRaw.split(/[,，、\s]+/).filter(Boolean):[];
-
-  if(kbConnected){
-    runKBSearch(mainTerm,subTerms);
-  }else{
-    runLocalSearch(mainTerm,subTerms);
-  }
+  if(kbConnected){runKBSearch(mainTerm,subTerms);}
+  else{runLocalSearch(mainTerm,subTerms);}
 }
 
 async function runKBSearch(mainTerm,subTerms){
@@ -991,84 +1113,55 @@ async function runKBSearch(mainTerm,subTerms){
   try{
     const kbRes=await kbSearch(mainTerm,30);
     let results=kbRes.results||[];
-    // Post-filter by sub terms if provided
-    if(subTerms.length&&results.length){
-      results=results.filter(r=>subTerms.some(st=>r.content.includes(st)));
-    }
+    if(subTerms.length&&results.length)results=results.filter(r=>subTerms.some(st=>r.content.includes(st)));
     if(!results.length){toast('未找到匹配条文');$('btnSearch').disabled=false;$('btnSearch').textContent='搜索';return;}
     showResBar('search');
     $('sumRow').innerHTML='<div class="sum-row">'+
-      '<div class="chip info">主搜索词：'+esc(mainTerm)+'</div>'+
-      '<div class="chip ok">KB语义搜索</div>'+
-      '<div class="chip info">匹配条文：'+results.length+'条</div>'+
-      (subTerms.length?('<div class="chip info">子过滤：'+subTerms.map(esc).join('、')+'</div>'):'')+
-      '</div>';
-    $('resList').innerHTML=`
-      <table class="res-table">
-        <thead><tr><th style="width:5%;">#</th><th style="width:22%;">来源规范</th><th>条文内容</th><th style="width:8%;">相似度</th></tr></thead>
-        <tbody>${results.map(r=>`
-          <tr>
-            <td style="font-size:0.7rem;color:var(--text-dim);">${r.chunk_index||''}</td>
-            <td style="font-size:0.72rem;">${esc((r.source||'').replace(/\.pdf$/i,''))}</td>
-            <td class="td-clause">${esc((r.content||'').substring(0,300))}</td>
-            <td style="font-size:0.8rem;font-weight:600;color:${r.score>=0.7?'var(--success)':r.score>=0.5?'var(--accent)':'var(--text-dim)'};">${(r.score*100).toFixed(0)}%</td>
-          </tr>`).join('')}</tbody>
-      </table>`;
+      '<div class="chip info">搜索词：'+esc(mainTerm)+'</div><div class="chip ok">KB语义搜索</div>'+
+      '<div class="chip info">匹配条文：'+results.length+'条</div>'+(subTerms.length?('<div class="chip info">子过滤：'+subTerms.map(esc).join('、')+'</div>'):'')+'</div>';
+    $('resList').innerHTML=results.map((r,i)=>`
+      <div class="search-result-item">
+        <div class="search-result-source">${i+1}. ${esc((r.source||'').replace(/\.pdf$/i,''))} · 相似度 <strong style="color:${r.score>=0.7?'var(--success)':r.score>=0.5?'var(--accent)':'var(--text-dim)'};">${(r.score*100).toFixed(0)}%</strong></div>
+        <div class="search-result-content">${esc(r.content||'').substring(0,500)}</div>
+        <div class="search-result-meta">Chunk #${r.chunk_index||''} · ${(r.content||'').length} 字</div>
+      </div>`).join('');
     toast('语义搜索完成，找到 '+results.length+' 条相关条文');
   }catch(e){toast('KB搜索失败，回退到本地搜索');runLocalSearch(mainTerm,subTerms);}
   $('btnSearch').disabled=false;$('btnSearch').textContent='搜索';
 }
 
 function runLocalSearch(mainTerm,subTerms){
-  // Step 1: find files containing main term
   const matchedFiles=regFiles.filter(f=>f.text.includes(mainTerm));
   if(!matchedFiles.length){toast('未找到包含"'+mainTerm+'"的规范文件');return;}
-  // Step 2: within matched files, find clauses containing sub terms
   const results=[];
   for(const file of matchedFiles){
-    // Split into paragraphs
     const paras=file.text.split(/[\n\r]+/).filter(p=>p.trim().length>5);
     for(let pi=0;pi<paras.length;pi++){
       const para=paras[pi];
       if(subTerms.length===0){
-        // No sub filter: show all paragraphs with main term
-        if(para.includes(mainTerm)){
-          results.push({fileName:file.name.replace(/\.pdf$/i,''),paragraph:para.substring(0,200),pageHint:Math.floor(pi*file.pageCount/paras.length)+1});
-        }
+        if(para.includes(mainTerm))results.push({fileName:file.name.replace(/\.pdf$/i,''),paragraph:para.substring(0,300),pageHint:Math.floor(pi*file.pageCount/paras.length)+1});
       }else{
-        // Show paragraphs that contain at least one sub term
-        const hits=[];
-        for(const st of subTerms){if(para.includes(st))hits.push(st);}
-        if(hits.length>0){
-          results.push({fileName:file.name.replace(/\.pdf$/i,''),paragraph:para.substring(0,200),pageHint:Math.floor(pi*file.pageCount/paras.length)+1,matchTerms:hits});
-        }
+        const hits=[];for(const st of subTerms){if(para.includes(st))hits.push(st);}
+        if(hits.length>0)results.push({fileName:file.name.replace(/\.pdf$/i,''),paragraph:para.substring(0,300),pageHint:Math.floor(pi*file.pageCount/paras.length)+1,matchTerms:hits});
       }
     }
   }
   if(!results.length){toast('未找到匹配条文');return;}
   showResBar('search');
   $('sumRow').innerHTML='<div class="sum-row">'+
-    '<div class="chip info">主搜索词：'+esc(mainTerm)+'</div>'+
-    '<div class="chip info">匹配文件：'+matchedFiles.length+'个</div>'+
-    '<div class="chip info">匹配条文：'+results.length+'条</div>'+
-    (subTerms.length?('<div class="chip info">子过滤：'+subTerms.map(esc).join('、')+'</div>'):'')+
-    '</div>';
-  $('resList').innerHTML=`
-    <table class="res-table">
-      <thead><tr><th style="width:25%;">规范文件</th><th style="width:15%;">匹配词</th><th>条文内容</th><th style="width:8%;">≈页码</th></tr></thead>
-      <tbody>${results.map(r=>`
-        <tr>
-          <td style="font-size:0.72rem;">${esc(r.fileName)}</td>
-          <td>${r.matchTerms?r.matchTerms.map(t=>`<span class="kw-text">${esc(t)}</span>`).join(' '):'<span class="hl-text">'+esc(mainTerm)+'</span>'}</td>
-          <td class="td-clause">${esc(r.paragraph)}</td>
-          <td style="font-size:0.7rem;color:var(--text-dim);">≈p.${r.pageHint}</td>
-        </tr>`).join('')}</tbody>
-    </table>`;
+    '<div class="chip info">搜索词：'+esc(mainTerm)+'</div><div class="chip info">匹配文件：'+matchedFiles.length+'个</div>'+
+    '<div class="chip info">条文：'+results.length+'条</div>'+(subTerms.length?('<div class="chip info">子过滤：'+subTerms.map(esc).join('、')+'</div>'):'')+'</div>';
+  $('resList').innerHTML=results.map((r,i)=>`
+    <div class="search-result-item">
+      <div class="search-result-source">${i+1}. ${esc(r.fileName)} · ≈p.${r.pageHint}</div>
+      <div class="search-result-content">${esc(r.paragraph)}</div>
+      ${r.matchTerms?`<div class="search-result-meta">匹配：${r.matchTerms.map(t=>`<span class="kw-text">${esc(t)}</span>`).join(' ')}</div>`:''}
+    </div>`).join('');
   toast('找到 '+results.length+' 条相关条文');
 }
 
 /* ===================================================================
-   11. MODE: ONE-CLICK SCAN (一键扫描)
+   11. MODE: ONE-CLICK SCAN
    =================================================================== */
 function bindScanEvents(){
   $('scanFileCount').textContent=regFiles.length;
@@ -1081,7 +1174,7 @@ function bindScanEvents(){
   $('btnScan').addEventListener('click',runScan);
   const hint=$('scanKBHint');
   if(hint)hint.innerHTML=kbConnected
-    ?'<span style="color:var(--success);">&#10003; 知识库已连接，将使用语义驱动扫描</span>'
+    ?'<span style="color:var(--success);">✓ 知识库已连接，将使用语义驱动扫描</span>'
     :'<span style="color:var(--text-dim);">知识库离线，使用关键词驱动扫描</span>';
 }
 
@@ -1103,147 +1196,101 @@ async function loadScanDraw(file){
 async function runScan(){
   if(!regFiles.length){toast('请先在"规范管理"中加载规范文件');return}
   const prog=$('scanProgress'),bar=$('scanBar'),status=$('scanStatus');
-  prog.classList.remove('hidden');bar.style.width='0%';status.textContent='正在扫描...';
+  if(prog)prog.classList.remove('hidden');
+  if(bar)bar.style.width='0%';
+  if(status)status.textContent='正在扫描...';
 
   let fireLaneClauses=[],rescueSiteClauses=[],identifiedReg='',kbUsed=false;
 
   if(kbConnected){
-    // === KB-driven scan ===
-    status.textContent='KB步骤1/3：语义检索消防车道要求...';
-    bar.style.width='20%';
-    try{
-      const laneRes=await kbSearch('消防车道 宽度 设置 要求',15);
-      if(laneRes.results){
-        fireLaneClauses=laneRes.results.map(r=>({content:r.content,source:r.source||'',score:r.score}));
-      }
-    }catch(e){/* fall through to local */}
-
-    bar.style.width='50%';
-    status.textContent='KB步骤2/3：语义检索救援场地要求...';
+    if(status)status.textContent='KB步骤1/3：语义检索消防车道要求...';
+    if(bar)bar.style.width='20%';
+    try{const laneRes=await kbSearch('消防车道 宽度 设置 要求',15);if(laneRes.results)fireLaneClauses=laneRes.results.map(r=>({content:r.content,source:r.source||'',score:r.score}));}catch(e){}
+    if(bar)bar.style.width='50%';
+    if(status)status.textContent='KB步骤2/3：语义检索救援场地要求...';
     await sleep(80);
-    try{
-      const rescueRes=await kbSearch('救援场地 登高操作场地 设置 要求',15);
-      if(rescueRes.results){
-        rescueSiteClauses=rescueRes.results.map(r=>({content:r.content,source:r.source||'',score:r.score}));
-      }
-    }catch(e){/* fall through to local */}
-
-    bar.style.width='70%';
-    status.textContent='KB步骤3/3：识别主要防火规范...';
+    try{const rescueRes=await kbSearch('救援场地 登高操作场地 设置 要求',15);if(rescueRes.results)rescueSiteClauses=rescueRes.results.map(r=>({content:r.content,source:r.source||'',score:r.score}));}catch(e){}
+    if(bar)bar.style.width='70%';
+    if(status)status.textContent='KB步骤3/3：识别主要防火规范...';
     await sleep(80);
-    try{
-      const regRes=await kbSearch('建筑设计防火规范 民用建筑 消防车道 救援场地',5);
-      if(regRes.results&&regRes.results.length>0){
-        const sources=[...new Set(regRes.results.map(r=>r.source))];
-        identifiedReg=sources.slice(0,2).join('、');
-        kbUsed=true;
-      }
-    }catch(e){/* fall through */}
+    try{const regRes=await kbSearch('建筑设计防火规范 民用建筑 消防车道 救援场地',5);if(regRes.results&&regRes.results.length>0){const sources=[...new Set(regRes.results.map(r=>r.source))];identifiedReg=sources.slice(0,2).join('、');kbUsed=true;}}catch(e){}
   }
 
-  // Fallback: local keyword classification if KB didn't return enough
   if(!kbUsed||fireLaneClauses.length<3||rescueSiteClauses.length<3){
-    status.textContent='补充本地搜索...';
-    bar.style.width='60%';
+    if(status)status.textContent='补充本地搜索...';
+    if(bar)bar.style.width='60%';
     const scores=[];
     const kwMap={'建筑设计防火规范':10,'建筑防火通用规范':10,'消防':3,'防火':2,'疏散':2,'民用建筑':1,'建筑设计防火':8,'防火规范':5,'建筑防火':4};
-    for(const f of regFiles){
-      let score=0;
-      for(const [kw,w] of Object.entries(kwMap)){
-        const re=new RegExp(kw,'g');const matches=f.text.match(re);
-        if(matches)score+=matches.length*w;
-      }
-      if(score>0)scores.push({file:f,score});
-    }
+    for(const f of regFiles){let score=0;for(const[kw,w]of Object.entries(kwMap)){const re=new RegExp(kw,'g');const matches=f.text.match(re);if(matches)score+=matches.length*w;}if(score>0)scores.push({file:f,score});}
     scores.sort((a,b)=>b.score-a.score);
-    if(scores.length&&!identifiedReg){
-      identifiedReg=scores[0].file.name.replace(/\.pdf$/i,'');
-    }
-    // Supplement from local if KB results are sparse
-    if(fireLaneClauses.length<3&&scores.length){
-      const targetText=scores[0].file.text;
-      const paras=targetText.split(/[\n\r]+/).filter(p=>p.trim().length>10);
-      for(const p of paras){
-        if(/消防车道/.test(p))fireLaneClauses.push({content:p.substring(0,300),source:scores[0].file.name,score:1});
-        if(/(?:救援场地|消防救援场地|登高操作场地|消防登高)/.test(p))rescueSiteClauses.push({content:p.substring(0,300),source:scores[0].file.name,score:1});
-      }
-    }
+    if(scores.length&&!identifiedReg)identifiedReg=scores[0].file.name.replace(/\.pdf$/i,'');
+    if(fireLaneClauses.length<3&&scores.length){const tt=scores[0].file.text;const paras=tt.split(/[\n\r]+/).filter(p=>p.trim().length>10);for(const p of paras){if(/消防车道/.test(p))fireLaneClauses.push({content:p.substring(0,300),source:scores[0].file.name,score:1});if(/(?:救援场地|消防救援场地|登高操作场地|消防登高)/.test(p))rescueSiteClauses.push({content:p.substring(0,300),source:scores[0].file.name,score:1});}}
   }
 
-  // Deduplicate
   fireLaneClauses=fireLaneClauses.filter((c,i,a)=>a.findIndex(x=>x.content.substring(0,40)===c.content.substring(0,40))===i);
   rescueSiteClauses=rescueSiteClauses.filter((c,i,a)=>a.findIndex(x=>x.content.substring(0,40)===c.content.substring(0,40))===i);
 
-  // Compliance check if site plan loaded
-  bar.style.width='85%';
-  status.textContent='分析合规性...';
+  if(bar)bar.style.width='85%';
+  if(status)status.textContent='分析合规性...';
   await sleep(80);
   let complianceHTML='';
   if(scanDrawPages.length){
     const siteText=scanDrawPages.map(p=>p.text).join('\n');
-    const hasFireLane=/消防车道|消防通道/.test(siteText);
-    const hasRescueSite=/救援场地|登高操作|消防救援/.test(siteText);
-    const dims4m=siteText.match(/(?:车道|通道|道路).*?宽度.*?(\d+\.?\d*)\s*(?:[mM]|米)/);
-    const dims15m=siteText.match(/(?:场地|登高).*?(?:长|长度).*?(\d+\.?\d*)\s*(?:[mM]|米)/);
-    const dims10m=siteText.match(/(?:场地|登高).*?(?:宽|宽度).*?(\d+\.?\d*)\s*(?:[mM]|米)/);
+    const hasFireLane=/消防车道|消防通道/.test(siteText),hasRescueSite=/救援场地|登高操作|消防救援/.test(siteText);
+    complianceHTML='<div style="margin-top:10px;padding:12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);">'+
+      '<div style="font-weight:600;margin-bottom:8px;">场地总图合规性初步分析</div>'+
+      '<div style="font-size:0.82rem;line-height:1.8;">📌 消防车道：'+(hasFireLane?'<span style="color:var(--success);">已在图中标注</span>':'<span style="color:var(--danger);">未在图中找到标注</span>')+'</div>'+
+      '<div style="font-size:0.82rem;line-height:1.8;">📌 救援场地：'+(hasRescueSite?'<span style="color:var(--success);">已在图中标注</span>':'<span style="color:var(--danger);">未在图中找到标注</span>')+'</div>'+
+      '<div style="font-size:0.68rem;color:var(--text-dim);margin-top:6px;">注：此分析基于图中的文字标注。建议结合图纸图形尺寸进行人工复核。</div></div>';
+  }else{complianceHTML='<div style="margin-top:10px;padding:12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);font-size:0.82rem;color:var(--text-dim);">未上传场地总图，无法进行合规性对比。请上传总图后重新扫描。</div>';}
 
-    complianceHTML='<div style="margin-top:10px;padding:10px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);">'+
-      '<div style="font-weight:600;margin-bottom:6px;">场地总图合规性初步分析</div>';
-    complianceHTML+='<div style="font-size:0.76rem;">&#128204; 消防车道：'+(hasFireLane?'<span style="color:var(--success);">已在图中标注</span>':'<span style="color:var(--danger);">未在图中找到标注</span>')+'</div>';
-    complianceHTML+='<div style="font-size:0.76rem;">&#128204; 救援场地：'+(hasRescueSite?'<span style="color:var(--success);">已在图中标注</span>':'<span style="color:var(--danger);">未在图中找到标注</span>')+'</div>';
-    if(dims4m)complianceHTML+='<div style="font-size:0.76rem;">&#128207; 车道宽度标注：'+dims4m[0]+(parseFloat(dims4m[1])>=4?' <span style="color:var(--success);">≥4m ✓</span>':' <span style="color:var(--danger);"><4m ✗</span>')+'</div>';
-    if(dims15m)complianceHTML+='<div style="font-size:0.76rem;">&#128207; 场地长度标注：'+dims15m[0]+(parseFloat(dims15m[1])>=15?' <span style="color:var(--success);">≥15m ✓</span>':' <span style="color:var(--danger);"><15m ✗</span>')+'</div>';
-    if(dims10m)complianceHTML+='<div style="font-size:0.76rem;">&#128207; 场地宽度标注：'+dims10m[0]+(parseFloat(dims10m[1])>=10?' <span style="color:var(--success);">≥10m ✓</span>':' <span style="color:var(--danger);"><10m ✗</span>')+'</div>';
-    complianceHTML+='<div style="font-size:0.68rem;color:var(--text-dim);margin-top:6px;">注：此分析基于图中的文字标注。建议结合图纸图形尺寸进行人工复核。</div></div>';
-  }else{
-    complianceHTML='<div style="margin-top:10px;padding:10px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);font-size:0.78rem;color:var(--text-dim);">未上传场地总图，无法进行合规性对比。请上传总图后重新扫描。</div>';
-  }
-
-  bar.style.width='100%';
-  status.textContent='扫描完成';
+  if(bar)bar.style.width='100%';
+  if(status)status.textContent='扫描完成';
   await sleep(200);
-  prog.classList.add('hidden');
+  if(prog)prog.classList.add('hidden');
 
-  // Display results
   showResBar('scan');
   $('sumRow').innerHTML='<div class="sum-row">'+
     '<div class="chip info">识别规范：'+esc(identifiedReg||'(未识别)')+'</div>'+
     (kbUsed?'<div class="chip ok">KB语义驱动</div>':'<div class="chip info">本地关键词驱动</div>')+
-    '<div class="chip info">消防车道条文：'+fireLaneClauses.length+'条</div>'+
-    '<div class="chip info">救援场地条文：'+rescueSiteClauses.length+'条</div>'+
-    '</div>';
+    '<div class="chip info">消防车道：'+fireLaneClauses.length+'条</div>'+
+    '<div class="chip info">救援场地：'+rescueSiteClauses.length+'条</div></div>';
 
   let html='';
   if(identifiedReg){
-    html+='<div class="sec-title" style="font-size:0.78rem;margin-top:8px;">&#128293; 识别到的防火规范</div>';
-    html+='<div style="font-size:0.76rem;margin-bottom:6px;"><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.72rem;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);">'+esc(identifiedReg)+'</span></div>';
+    html+='<div class="sec-title" style="font-size:0.82rem;margin-top:8px;">🔥 识别到的防火规范</div>';
+    html+='<div style="margin-bottom:8px;"><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.76rem;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);">'+esc(identifiedReg)+'</span></div>';
   }
-
-  html+='<div class="sec-title" style="font-size:0.78rem;margin-top:10px;">&#128663; 消防车道要求（'+fireLaneClauses.length+'条）</div>';
+  html+='<div class="sec-title" style="font-size:0.82rem;margin-top:10px;">🚒 消防车道要求（'+fireLaneClauses.length+'条）</div>';
   if(fireLaneClauses.length){
-    html+='<table class="res-table"><thead><tr><th style="width:5%;">#</th><th>条文内容</th>'+(kbUsed?'<th style="width:10%;">相似度</th><th style="width:18%;">来源</th>':'')+'</tr></thead><tbody>'+
-      fireLaneClauses.map((c,i)=>`<tr>
-        <td style="font-size:0.7rem;color:var(--text-dim);">${i+1}</td>
-        <td class="td-clause">${esc((c.content||'').substring(0,300))}</td>
-        ${kbUsed?`<td style="font-size:0.75rem;font-weight:600;color:${(c.score||0)>=0.7?'var(--success)':(c.score||0)>=0.5?'var(--accent)':'var(--text-dim)'};">${c.score?((c.score*100).toFixed(0)+'%'):'—'}</td>
-        <td style="font-size:0.68rem;color:var(--text-dim);">${esc((c.source||'').replace(/\.pdf$/i,'').substring(0,30))}</td>`:''}
-      </tr>`).join('')+'</tbody></table>';
-  }else{html+='<div style="font-size:0.76rem;color:var(--text-dim);padding:6px;">未找到相关条文</div>';}
+    html+=fireLaneClauses.map((c,i)=>`
+      <div class="error-card" onclick="navigateToErrorFromClause('${esc((c.content||'').substring(0,60))}')">
+        <div class="ec-num">${i+1}. 消防车道要求</div>
+        <div class="ec-clause">📖 ${esc((c.content||'').substring(0,350))}</div>
+        <div class="ec-loc">📍 来源：${esc((c.source||'').replace(/\.pdf$/i,''))} ${kbUsed&&c.score?(' · 相似度 '+((c.score*100).toFixed(0)+'%')):''}</div>
+      </div>`).join('');
+  }else{html+='<div style="font-size:0.82rem;color:var(--text-dim);padding:6px;">未找到相关条文</div>';}
 
-  html+='<div class="sec-title" style="font-size:0.78rem;margin-top:10px;">&#128506; 救援场地要求（'+rescueSiteClauses.length+'条）</div>';
+  html+='<div class="sec-title" style="font-size:0.82rem;margin-top:10px;">🏗️ 救援场地要求（'+rescueSiteClauses.length+'条）</div>';
   if(rescueSiteClauses.length){
-    html+='<table class="res-table"><thead><tr><th style="width:5%;">#</th><th>条文内容</th>'+(kbUsed?'<th style="width:10%;">相似度</th><th style="width:18%;">来源</th>':'')+'</tr></thead><tbody>'+
-      rescueSiteClauses.map((c,i)=>`<tr>
-        <td style="font-size:0.7rem;color:var(--text-dim);">${i+1}</td>
-        <td class="td-clause">${esc((c.content||'').substring(0,300))}</td>
-        ${kbUsed?`<td style="font-size:0.75rem;font-weight:600;color:${(c.score||0)>=0.7?'var(--success)':(c.score||0)>=0.5?'var(--accent)':'var(--text-dim)'};">${c.score?((c.score*100).toFixed(0)+'%'):'—'}</td>
-        <td style="font-size:0.68rem;color:var(--text-dim);">${esc((c.source||'').replace(/\.pdf$/i,'').substring(0,30))}</td>`:''}
-      </tr>`).join('')+'</tbody></table>';
-  }else{html+='<div style="font-size:0.76rem;color:var(--text-dim);padding:6px;">未找到相关条文</div>';}
-
+    html+=rescueSiteClauses.map((c,i)=>`
+      <div class="error-card" onclick="navigateToErrorFromClause('${esc((c.content||'').substring(0,60))}')">
+        <div class="ec-num">${fireLaneClauses.length+i+1}. 救援场地要求</div>
+        <div class="ec-clause">📖 ${esc((c.content||'').substring(0,350))}</div>
+        <div class="ec-loc">📍 来源：${esc((c.source||'').replace(/\.pdf$/i,''))} ${kbUsed&&c.score?(' · 相似度 '+((c.score*100).toFixed(0)+'%')):''}</div>
+      </div>`).join('');
+  }else{html+='<div style="font-size:0.82rem;color:var(--text-dim);padding:6px;">未找到相关条文</div>';}
   html+=complianceHTML;
   $('resList').innerHTML=html;
   toast('扫描完成 · '+(kbUsed?'KB语义驱动':'本地关键词驱动')+' · '+(identifiedReg||'无匹配'));
+}
+
+function navigateToErrorFromClause(clausePreview){
+  if(!drawPages.length&&!scanDrawPages.length&&!smartDrawPages.length){toast('请先上传图纸');return;}
+  const pages=drawPages.length?drawPages:(scanDrawPages.length?scanDrawPages:smartDrawPages);
+  const searchText=clausePreview.substring(0,30);
+  for(const dp of pages){if(dp.text.includes(searchText)){navigateToPage(dp.pageNum);return;}}
+  if(pages.length)navigateToPage(1);
 }
 
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
@@ -1259,20 +1306,22 @@ function resetAll(){
   smartReqs=[];smartRooms=[];
   checkIssues=[];checkTypos=[];checkUnits=[];
   saveRegs();saveKW();
-  $('pdfEmpty').classList.remove('hidden');$('pdfPages').innerHTML='';
+  clearQuickDrawing();
+  hidePanel();
   $('resBar').classList.add('hidden');
-  renderLeftPanel();toast('所有数据已清除');
+  toast('所有数据已清除');
 }
 
 /* ===================================================================
    13. INIT
    =================================================================== */
 (function init(){
-  renderLeftPanel();
+  bindQuickUpload();
+  switchMode('manage');
   if(regKeywords.length){
     const box=$('kwBox');if(box)box.style.display='block';
-    const kwHTML=`<div class="sec-title" style="font-size:0.78rem;">已提取关键词（${regKeywords.length}个）</div>
-      <div style="display:flex;flex-wrap:wrap;gap:3px;max-height:80px;overflow-y:auto;">${regKeywords.slice(0,60).map(k=>`<span style="font-size:0.68rem;padding:2px 6px;border-radius:3px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(201,169,92,0.2);">${esc(k)}</span>`).join('')}${regKeywords.length>60?'<span style="font-size:0.68rem;color:var(--text-dim);padding:2px 6px;">...共'+regKeywords.length+'个</span>':''}</div>`;
+    const kwHTML=`<div class="sec-title" style="font-size:0.76rem;">已提取关键词（${regKeywords.length}个）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px;max-height:80px;overflow-y:auto;">${regKeywords.slice(0,60).map(k=>`<span style="font-size:0.66rem;padding:2px 5px;border-radius:3px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(201,169,92,0.2);">${esc(k)}</span>`).join('')}${regKeywords.length>60?'<span style="font-size:0.66rem;color:var(--text-dim);padding:2px 5px;">...共'+regKeywords.length+'个</span>':''}</div>`;
     if(box)box.innerHTML=kwHTML;
   }
   updateCheckBtn();
